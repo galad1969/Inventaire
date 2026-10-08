@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="fr" class="h-full bg-slate-50 text-slate-900 antialiased">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Inventaire Privé</title>
+    <meta name="description" content="Application web de gestion d'inventaire personnel hors-ligne (Offline-first), avec IndexedDB et import/export JSON complet." />
+    <meta property="og:title" content="Inventaire Privé" />
+    <meta property="og:description" content="Application web de gestion d'inventaire personnel hors-ligne (Offline-first), avec IndexedDB et import/export JSON complet." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Correctif anti-page blanche GitHub Pages : assure le slash terminal pour la résolution correcte des chemins relatifs -->
+    <script>
+      (function() {
+        var path = window.location.pathname;
+        if (path && !path.endsWith('/') && !path.endsWith('.html') && !path.split('/').pop().includes('.')) {
+          window.location.replace(path + '/' + window.location.search + window.location.hash);
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="./assets/index-BIP_BuaV.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-iK9UvJHI.css">
+  </head>
+  <body class="h-full bg-slate-50 text-slate-900 selection:bg-blue-600 selection:text-white">
+    <noscript>
+      <div style="font-family: -apple-system, sans-serif; padding: 40px; text-align: center; color: #1d1d1f; max-width: 480px; margin: 40px auto; background: white; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+        <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 8px;">JavaScript requis</h2>
+        <p style="font-size: 14px; color: #6e6e73;">Veuillez activer JavaScript dans votre navigateur pour accéder à Inventaire Privé.</p>
+      </div>
+    </noscript>
+    <div id="root" class="h-full"></div>
+  </body>
+</html>
+
