@@ -1,0 +1,637 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  Package,
+  Search,
+  Filter,
+  X,
+  Sparkles,
+  ArrowUpDown,
+  Tag,
+  ShieldCheck,
+  RotateCcw,
+  Plus,
+} from 'lucide-react';
+import { useInventory } from '../context/InventoryContext';
+import { getMediaById } from '../services/db';
+import {
+  InventoryItem,
+  ViewMode,
+  SortOption,
+  FilterState,
+} from '../types/inventory';
+import { ViewModeSelector } from '../components/inventory/ViewModeSelector';
+import { FilterDrawer } from '../components/inventory/FilterDrawer';
+import { ItemQuickViewModal } from '../components/inventory/ItemQuickViewModal';
+import { LargeGridView } from '../components/inventory/LargeGridView';
+import { CompactGridView } from '../components/inventory/CompactGridView';
+import { ListView } from '../components/inventory/ListView';
+
+export const InventoryPage: React.FC = () => {
+  const {
+    items,
+    loading,
+    searchQuery,
+    setSearchQuery,
+    selectedCategory,
+    setSelectedCategory,
+    selectedResidence,
+    setSelectedResidence,
+    settings,
+    seedDemoData,
+    openCreateModal,
+  } = useInventory();
+
+  // Mode d'affichage (stocké dans le localStorage si présent)
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    return (localStorage.getItem('inventaire_view_mode') as ViewMode) || 'large-grid';
+  });
+
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    localStorage.setItem('inventaire_view_mode', mode);
+  };
+
+  // Tri sélectionné
+  const [sortOption, setSortOption] = useState<SortOption>('updated-desc');
+
+  // Filtres avancés
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  const [filters, setFilters] = useState<FilterState>({
+    search: '',
+    category: null,
+    residence: null,
+    condition: 'all',
+    status: 'all',
+    warranty: 'all',
+    minPrice: undefined,
+    maxPrice: undefined,
+    hasPackaging: false,
+    hasAccessories: false,
+    hasInvoice: false,
+  });
+
+  // Modal de consultation détaillée de l'objet
+  const [inspectedItem, setInspectedItem] = useState<InventoryItem | null>(null);
+
+  // Cache d'URLs pour les vignettes
+  const [mediaUrls, setMediaUrls] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadThumbnails() {
+      const urls: Record<string, string> = {};
+      for (const it of items) {
+        if (it.primaryPhotoId && !urls[it.primaryPhotoId]) {
+          const media = await getMediaById(it.primaryPhotoId);
+          if (media && media.blob && isMounted) {
+            urls[it.primaryPhotoId] = URL.createObjectURL(media.blob);
+          }
+        }
+      }
+      if (isMounted) setMediaUrls(urls);
+    }
+    loadThumbnails();
+    return () => {
+      isMounted = false;
+    };
+  }, [items]);
+
+  // Synchronisation avec les filtres rapides de la Sidebar / Navbar
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      category: selectedCategory,
+      residence: selectedResidence,
+    }));
+  }, [selectedCategory, selectedResidence]);
+
+  // Nombre de filtres actifs pour le badge
+  const activeFiltersCount = useMemo(() => {
+    let count = 0;
+    if (filters.condition !== 'all') count++;
+    if (filters.status !== 'all') count++;
+    if (filters.warranty !== 'all') count++;
+    if (filters.minPrice !== undefined) count++;
+    if (filters.maxPrice !== undefined) count++;
+    if (filters.hasPackaging) count++;
+    if (filters.hasAccessories) count++;
+    if (filters.hasInvoice) count++;
+    if (filters.category) count++;
+    if (filters.residence) count++;
+    return count;
+  }, [filters]);
+
+  const handleResetAllFilters = () => {
+    setSearchQuery('');
+    setSelectedCategory(null);
+    setSelectedResidence(null);
+    setFilters({
+      search: '',
+      category: null,
+      residence: null,
+      condition: 'all',
+      status: 'all',
+      warranty: 'all',
+      minPrice: undefined,
+      maxPrice: undefined,
+      hasPackaging: false,
+      hasAccessories: false,
+      hasInvoice: false,
+    });
+  };
+
+  // Filtrage et Tri combinés
+  const processedItems = useMemo(() => {
+    const today = new Date().toISOString().slice(0, 10);
+
+    // 1. Filtrage
+    const filtered = items.filter((item) => {
+      // Exclure les archivés de l'inventaire principal
+      if (item.status === 'archive') return false;
+
+      // Filtre catégorie
+      if (filters.category && item.category !== filters.category) return false;
+
+      // Filtre résidence
+      if (filters.residence && item.location?.residence !== filters.residence) return false;
+
+      // Filtre statut
+      if (filters.status !== 'all' && item.status !== filters.status) return false;
+
+      // Filtre état
+      if (filters.condition !== 'all' && item.condition !== filters.condition) return false;
+
+      // Filtre garantie
+      if (filters.warranty === 'active') {
+        if (!item.warrantyEndDate || item.warrantyEndDate < today) return false;
+      } else if (filters.warranty === 'expired') {
+        if (!item.warrantyEndDate || item.warrantyEndDate >= today) return false;
+      }
+
+      // Filtre fourchette de prix
+      if (filters.minPrice !== undefined && (item.purchasePrice || 0) < filters.minPrice) return false;
+      if (filters.maxPrice !== undefined && (item.purchasePrice || 0) > filters.maxPrice) return false;
+
+      // Filtre emballage
+      if (filters.hasPackaging) {
+        const hasBox = item.relations?.some((r) => r.type === 'packaging');
+        if (!hasBox) return false;
+      }
+
+      // Filtre accessoires
+      if (filters.hasAccessories) {
+        const hasAcc = item.relations?.some((r) => r.type === 'accessory');
+        if (!hasAcc) return false;
+      }
+
+      // Filtre facture
+      if (filters.hasInvoice) {
+        if (!item.mediaIds || item.mediaIds.length === 0) return false;
+      }
+
+      // Recherche globale (Omnibar)
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim();
+        const matchName = item.name.toLowerCase().includes(q);
+        const matchBrand = item.brand?.toLowerCase().includes(q) || false;
+        const matchModel = item.model?.toLowerCase().includes(q) || false;
+        const matchSerial = item.serialNumber?.toLowerCase().includes(q) || false;
+        const matchCategory = item.category.toLowerCase().includes(q);
+        const matchResidence = item.location?.residence.toLowerCase().includes(q) || false;
+        const matchRoom = item.location?.room.toLowerCase().includes(q) || false;
+        const matchFurniture = item.location?.furniture.toLowerCase().includes(q) || false;
+        const matchSubLocation = item.location?.subLocation.toLowerCase().includes(q) || false;
+        const matchTags = item.tags?.some((t) => t.toLowerCase().includes(q)) || false;
+        const matchNotes = item.notes?.toLowerCase().includes(q) || false;
+
+        if (
+          !matchName &&
+          !matchBrand &&
+          !matchModel &&
+          !matchSerial &&
+          !matchCategory &&
+          !matchResidence &&
+          !matchRoom &&
+          !matchFurniture &&
+          !matchSubLocation &&
+          !matchTags &&
+          !matchNotes
+        ) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+    // 2. Tri
+    return filtered.sort((a, b) => {
+      switch (sortOption) {
+        case 'name-asc':
+          return a.name.localeCompare(b.name);
+        case 'name-desc':
+          return b.name.localeCompare(a.name);
+        case 'price-desc':
+          return (b.purchasePrice || 0) - (a.purchasePrice || 0);
+        case 'price-asc':
+          return (a.purchasePrice || 0) - (b.purchasePrice || 0);
+        case 'date-desc':
+          return (b.purchaseDate || '').localeCompare(a.purchaseDate || '');
+        case 'date-asc':
+          return (a.purchaseDate || '').localeCompare(b.purchaseDate || '');
+        case 'updated-desc':
+        default:
+          return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      }
+    });
+  }, [items, filters, searchQuery, sortOption]);
+
+  const totalFilteredValue = useMemo(() => {
+    return processedItems.reduce((acc, it) => acc + (it.purchasePrice || 0), 0);
+  }, [processedItems]);
+
+  return (
+    <div className="space-y-6">
+      
+      {/* Top Header: Title, Controls, and Toolbar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-[#1d1d1f]">
+              Tous les objets
+            </h1>
+            <p className="text-xs text-[#86868b] mt-0.5">
+              {processedItems.length} objet{processedItems.length > 1 ? 's' : ''} affiché{processedItems.length > 1 ? 's' : ''}
+              {totalFilteredValue > 0 && ` • Valeur totale : ${totalFilteredValue.toLocaleString('fr-FR')} €`}
+            </p>
+          </div>
+
+          <button
+            onClick={() => openCreateModal()}
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold shadow-xs transition active:scale-[0.98] cursor-pointer ml-2"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Ajouter</span>
+          </button>
+        </div>
+
+        {/* Toolbar: Sort dropdown + Filter button + View Mode Segmented Control */}
+        <div className="flex items-center gap-2.5 flex-wrap">
+          
+          {/* Tri sélecteur style Apple */}
+          <div className="relative">
+            <select
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value as SortOption)}
+              className="appearance-none pl-8 pr-8 py-2 text-xs font-medium rounded-xl bg-white border border-black/[0.08] text-[#1d1d1f] hover:bg-[#f5f5f7] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 shadow-2xs transition cursor-pointer"
+            >
+              <option value="updated-desc">Récemment modifiés</option>
+              <option value="name-asc">Nom (A → Z)</option>
+              <option value="name-desc">Nom (Z → A)</option>
+              <option value="price-desc">Prix (Décroissant)</option>
+              <option value="price-asc">Prix (Croissant)</option>
+              <option value="date-desc">Date d'achat (Récents)</option>
+              <option value="date-asc">Date d'achat (Anciens)</option>
+            </select>
+            <ArrowUpDown className="w-3.5 h-3.5 text-[#86868b] absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
+          {/* Bouton Filtres avec badge interactif */}
+          <button
+            onClick={() => setIsFilterDrawerOpen(true)}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium border transition cursor-pointer shadow-2xs ${
+              activeFiltersCount > 0
+                ? 'bg-[#0071e3]/10 text-[#0071e3] border-[#0071e3]/30'
+                : 'bg-white text-[#1d1d1f] border-black/[0.08] hover:bg-[#f5f5f7]'
+            }`}
+          >
+            <Filter className="w-3.5 h-3.5" />
+            <span>Filtres</span>
+            {activeFiltersCount > 0 && (
+              <span className="w-4 h-4 rounded-full bg-[#0071e3] text-white text-[10px] font-bold flex items-center justify-center">
+                {activeFiltersCount}
+              </span>
+            )}
+          </button>
+
+          {/* Sélecteur de mode de vue (Grande Grille / Petite Grille / Liste) */}
+          <ViewModeSelector
+            viewMode={viewMode}
+            onChange={handleViewModeChange}
+          />
+        </div>
+      </div>
+
+      {/* Barre de filtres rapides en un clic */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+        <button
+          onClick={() => {
+            setFilters({
+              ...filters,
+              status: 'all',
+              warranty: 'all',
+              hasPackaging: false,
+              hasAccessories: false,
+            });
+          }}
+          className={`px-3 py-1.5 rounded-xl text-xs font-medium shrink-0 transition cursor-pointer ${
+            filters.status === 'all' &&
+            filters.warranty === 'all' &&
+            !filters.hasPackaging &&
+            !filters.hasAccessories
+              ? 'bg-[#1d1d1f] text-white'
+              : 'bg-white text-[#555558] hover:bg-[#f5f5f7] border border-black/[0.06]'
+          }`}
+        >
+          Tous les objets
+        </button>
+
+        <button
+          onClick={() => {
+            setFilters({
+              ...filters,
+              status: filters.status === 'en_vente' ? 'all' : 'en_vente',
+            });
+          }}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium shrink-0 transition cursor-pointer ${
+            filters.status === 'en_vente'
+              ? 'bg-amber-500 text-white font-semibold shadow-xs'
+              : 'bg-white text-[#555558] hover:bg-[#f5f5f7] border border-black/[0.06]'
+          }`}
+        >
+          <span>🏷️ En vente</span>
+        </button>
+
+        <button
+          onClick={() => {
+            setFilters({
+              ...filters,
+              warranty: filters.warranty === 'active' ? 'all' : 'active',
+            });
+          }}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium shrink-0 transition cursor-pointer ${
+            filters.warranty === 'active'
+              ? 'bg-emerald-600 text-white font-semibold shadow-xs'
+              : 'bg-white text-[#555558] hover:bg-[#f5f5f7] border border-black/[0.06]'
+          }`}
+        >
+          <span>🛡️ Sous garantie</span>
+        </button>
+
+        <button
+          onClick={() => {
+            setFilters({
+              ...filters,
+              hasPackaging: !filters.hasPackaging,
+            });
+          }}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium shrink-0 transition cursor-pointer ${
+            filters.hasPackaging
+              ? 'bg-indigo-600 text-white font-semibold shadow-xs'
+              : 'bg-white text-[#555558] hover:bg-[#f5f5f7] border border-black/[0.06]'
+          }`}
+        >
+          <span>📦 Avec emballages</span>
+        </button>
+
+        <button
+          onClick={() => {
+            setFilters({
+              ...filters,
+              hasAccessories: !filters.hasAccessories,
+            });
+          }}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium shrink-0 transition cursor-pointer ${
+            filters.hasAccessories
+              ? 'bg-[#0071e3] text-white font-semibold shadow-xs'
+              : 'bg-white text-[#555558] hover:bg-[#f5f5f7] border border-black/[0.06]'
+          }`}
+        >
+          <span>🔌 Avec accessoires</span>
+        </button>
+      </div>
+
+      {/* Barre de pilules des filtres actifs */}
+      {(searchQuery || activeFiltersCount > 0) && (
+        <div className="flex flex-wrap items-center gap-1.5 pt-1">
+          {searchQuery && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-white border border-black/[0.08] text-[#1d1d1f] shadow-2xs">
+              <span>Recherche : « {searchQuery} »</span>
+              <button
+                onClick={() => setSearchQuery('')}
+                className="hover:text-rose-600 cursor-pointer"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          )}
+
+          {filters.category && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-[#0071e3]/10 text-[#0071e3] border border-[#0071e3]/20">
+              <span>Catégorie : {filters.category}</span>
+              <button
+                onClick={() => {
+                  setSelectedCategory(null);
+                  setFilters({ ...filters, category: null });
+                }}
+                className="hover:opacity-70 cursor-pointer"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          )}
+
+          {filters.residence && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-black/[0.05] text-[#1d1d1f] border border-black/[0.06]">
+              <span>📍 {filters.residence}</span>
+              <button
+                onClick={() => {
+                  setSelectedResidence(null);
+                  setFilters({ ...filters, residence: null });
+                }}
+                className="hover:opacity-70 cursor-pointer"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          )}
+
+          {filters.status !== 'all' && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-amber-50 text-amber-800 border border-amber-200">
+              <span>Statut : {filters.status === 'en_vente' ? 'En vente' : filters.status}</span>
+              <button
+                onClick={() => setFilters({ ...filters, status: 'all' })}
+                className="hover:opacity-70 cursor-pointer"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          )}
+
+          {filters.condition !== 'all' && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-slate-100 text-[#1d1d1f] border border-black/[0.06]">
+              <span>État : {filters.condition.replace(/_/g, ' ')}</span>
+              <button
+                onClick={() => setFilters({ ...filters, condition: 'all' })}
+                className="hover:opacity-70 cursor-pointer"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          )}
+
+          {filters.warranty !== 'all' && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-emerald-50 text-emerald-800 border border-emerald-200">
+              <span>Garantie : {filters.warranty === 'active' ? 'Active' : 'Expirée'}</span>
+              <button
+                onClick={() => setFilters({ ...filters, warranty: 'all' })}
+                className="hover:opacity-70 cursor-pointer"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          )}
+
+          {(filters.minPrice !== undefined || filters.maxPrice !== undefined) && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-slate-100 text-[#1d1d1f] border border-black/[0.06]">
+              <span>
+                Prix : {filters.minPrice ?? 0} € - {filters.maxPrice ?? '∞'} €
+              </span>
+              <button
+                onClick={() => setFilters({ ...filters, minPrice: undefined, maxPrice: undefined })}
+                className="hover:opacity-70 cursor-pointer"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          )}
+
+          {filters.hasPackaging && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-indigo-50 text-indigo-800 border border-indigo-200">
+              <span>📦 Emballage inclus</span>
+              <button
+                onClick={() => setFilters({ ...filters, hasPackaging: false })}
+                className="hover:opacity-70 cursor-pointer"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          )}
+
+          {filters.hasAccessories && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-indigo-50 text-indigo-800 border border-indigo-200">
+              <span>🔌 Accessoires inclus</span>
+              <button
+                onClick={() => setFilters({ ...filters, hasAccessories: false })}
+                className="hover:opacity-70 cursor-pointer"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          )}
+
+          {filters.hasInvoice && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-blue-50 text-blue-800 border border-blue-200">
+              <span>📄 Facture rattachée</span>
+              <button
+                onClick={() => setFilters({ ...filters, hasInvoice: false })}
+                className="hover:opacity-70 cursor-pointer"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          )}
+
+          <button
+            onClick={handleResetAllFilters}
+            className="text-xs text-[#86868b] hover:text-[#1d1d1f] px-2 py-1 rounded hover:bg-black/[0.04] transition cursor-pointer flex items-center gap-1"
+          >
+            <RotateCcw className="w-3 h-3" />
+            <span>Tout effacer</span>
+          </button>
+        </div>
+      )}
+
+      {/* Rendu des Vues : Grande Grille / Petite Grille / Liste */}
+      {processedItems.length === 0 ? (
+        <div className="py-16 text-center rounded-3xl bg-white border border-black/[0.06] shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-6">
+          <Package className="w-10 h-10 text-[#86868b] mx-auto mb-3 opacity-40" />
+          <h2 className="text-base font-semibold text-[#1d1d1f]">
+            {items.length === 0 ? 'Aucun objet dans votre inventaire' : 'Aucun objet ne correspond à vos filtres'}
+          </h2>
+          <p className="text-xs text-[#86868b] mt-1 max-w-sm mx-auto leading-relaxed">
+            {items.length === 0
+              ? 'Commencez par charger le jeu de données d\'exemple pour explorer votre inventaire personnel.'
+              : 'Modifiez votre recherche ou réinitialisez les filtres pour afficher l\'ensemble des objets.'}
+          </p>
+
+          {items.length === 0 ? (
+            <button
+              onClick={() => seedDemoData()}
+              disabled={loading}
+              className="mt-5 px-4 py-2 rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-medium shadow-sm transition active:scale-[0.98] inline-flex items-center gap-1.5 cursor-pointer"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Charger les exemples de démo</span>
+            </button>
+          ) : (
+            <button
+              onClick={handleResetAllFilters}
+              className="mt-4 px-4 py-2 rounded-xl bg-[#f5f5f7] hover:bg-[#ebebee] text-[#1d1d1f] text-xs font-medium border border-black/[0.06] transition inline-flex items-center gap-1.5 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Réinitialiser les filtres</span>
+            </button>
+          )}
+        </div>
+      ) : (
+        <>
+          {viewMode === 'large-grid' && (
+            <LargeGridView
+              items={processedItems}
+              mediaUrls={mediaUrls}
+              onItemClick={(item) => setInspectedItem(item)}
+            />
+          )}
+
+          {viewMode === 'compact-grid' && (
+            <CompactGridView
+              items={processedItems}
+              mediaUrls={mediaUrls}
+              onItemClick={(item) => setInspectedItem(item)}
+            />
+          )}
+
+          {viewMode === 'list' && (
+            <ListView
+              items={processedItems}
+              mediaUrls={mediaUrls}
+              onItemClick={(item) => setInspectedItem(item)}
+              sortOption={sortOption}
+              onSortChange={setSortOption}
+            />
+          )}
+        </>
+      )}
+
+      {/* Modal / Tiroir des filtres avancés */}
+      <FilterDrawer
+        isOpen={isFilterDrawerOpen}
+        onClose={() => setIsFilterDrawerOpen(false)}
+        filters={filters}
+        onChange={setFilters}
+        onReset={handleResetAllFilters}
+        categories={settings?.categories || []}
+        residences={settings?.residences || []}
+        totalMatches={processedItems.length}
+      />
+
+      {/* Modal d'inspection détaillée de la fiche objet */}
+      <ItemQuickViewModal
+        item={inspectedItem}
+        onClose={() => setInspectedItem(null)}
+      />
+
+    </div>
+  );
+};
