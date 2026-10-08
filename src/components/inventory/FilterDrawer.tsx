@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Filter, RotateCcw, Check, Tag, ShieldCheck, Box, FileText } from 'lucide-react';
+import { X, Filter, RotateCcw, Check, Tag, ShieldCheck, Box, FileText, Hash } from 'lucide-react';
 import { FilterState, ItemCondition, ItemStatus } from '../../types/inventory';
 
 interface FilterDrawerProps {
@@ -10,6 +10,7 @@ interface FilterDrawerProps {
   onReset: () => void;
   categories: string[];
   residences: string[];
+  tags?: Array<{ name: string; count: number }>;
   totalMatches: number;
 }
 
@@ -21,6 +22,7 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
   onReset,
   categories,
   residences,
+  tags = [],
   totalMatches,
 }) => {
   if (!isOpen) return null;
@@ -147,6 +149,56 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
                 ))}
               </div>
             </div>
+
+            {/* Filtre par Étiquettes / Tags */}
+            {tags.length > 0 && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-[#1d1d1f] uppercase tracking-wider flex items-center gap-1">
+                    <Hash className="w-3.5 h-3.5 text-[#0071e3]" />
+                    <span>Étiquettes (Tags)</span>
+                  </label>
+                  {filters.tag && (
+                    <button
+                      onClick={() => onChange({ ...filters, tag: null })}
+                      className="text-[11px] text-[#0071e3] hover:underline cursor-pointer"
+                    >
+                      Effacer
+                    </button>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-1 bg-[#fbfbfd] rounded-xl border border-black/[0.04]">
+                  {tags.map((t) => {
+                    const isSelected = filters.tag === t.name;
+                    return (
+                      <button
+                        key={t.name}
+                        onClick={() =>
+                          onChange({
+                            ...filters,
+                            tag: isSelected ? null : t.name,
+                          })
+                        }
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition cursor-pointer ${
+                          isSelected
+                            ? 'bg-[#0071e3] text-white shadow-2xs'
+                            : 'bg-white hover:bg-[#f5f5f7] text-[#1d1d1f] border border-black/[0.06]'
+                        }`}
+                      >
+                        <span>#{t.name}</span>
+                        <span
+                          className={`text-[9px] px-1 rounded-full ${
+                            isSelected ? 'bg-white/20 text-white' : 'bg-black/[0.05] text-[#86868b]'
+                          }`}
+                        >
+                          {t.count}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Fourchette de Prix d'Achat */}
             <div className="space-y-2">

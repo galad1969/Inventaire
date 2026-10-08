@@ -12,6 +12,7 @@ import {
   Sparkles,
   ChevronRight,
   HardDrive,
+  Hash,
 } from 'lucide-react';
 import { useInventory } from '../../context/InventoryContext';
 
@@ -28,6 +29,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     setSelectedCategory,
     selectedResidence,
     setSelectedResidence,
+    selectedTag,
+    setSelectedTag,
+    allTags,
     items,
     openInsuranceModal,
   } = useInventory();
@@ -263,6 +267,54 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               })}
             </div>
           </div>
+
+          {/* Filtres par Étiquettes / Tags transversaux */}
+          {allTags.length > 0 && (
+            <div>
+              <div className="text-[11px] font-semibold text-[#86868b] uppercase tracking-wider px-3 mb-2 flex items-center justify-between">
+                <span className="flex items-center gap-1">
+                  <Hash className="w-3 h-3 text-[#0071e3]" />
+                  <span>Étiquettes</span>
+                </span>
+                {selectedTag && (
+                  <button
+                    onClick={() => setSelectedTag(null)}
+                    className="text-[10px] text-[#0071e3] hover:underline normal-case cursor-pointer"
+                  >
+                    Effacer
+                  </button>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-1 px-2 max-h-44 overflow-y-auto">
+                {allTags.map(({ name, count }) => {
+                  const isSelected = selectedTag === name;
+                  return (
+                    <button
+                      key={name}
+                      onClick={() => {
+                        setSelectedTag(isSelected ? null : name);
+                        onClose();
+                      }}
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] transition cursor-pointer ${
+                        isSelected
+                          ? 'bg-[#0071e3] text-white font-semibold shadow-2xs'
+                          : 'bg-black/[0.04] hover:bg-black/[0.08] text-[#1d1d1f]'
+                      }`}
+                    >
+                      <span>#{name}</span>
+                      <span
+                        className={`text-[9px] px-1 rounded-full ${
+                          isSelected ? 'bg-white/20 text-white' : 'bg-black/[0.05] text-[#86868b]'
+                        }`}
+                      >
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
         </div>
 

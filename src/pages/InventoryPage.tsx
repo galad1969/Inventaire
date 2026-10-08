@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   RotateCcw,
   Plus,
+  Hash,
 } from 'lucide-react';
 import { useInventory } from '../context/InventoryContext';
 import { getMediaById } from '../services/db';
@@ -36,6 +37,9 @@ export const InventoryPage: React.FC = () => {
     setSelectedCategory,
     selectedResidence,
     setSelectedResidence,
+    selectedTag,
+    setSelectedTag,
+    allTags,
     settings,
     seedDemoData,
     openCreateModal,
@@ -43,12 +47,20 @@ export const InventoryPage: React.FC = () => {
 
   // Mode d'affichage (stocké dans le localStorage si présent)
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
-    return (localStorage.getItem('inventaire_view_mode') as ViewMode) || 'large-grid';
+    try {
+      return (localStorage.getItem('inventaire_view_mode') as ViewMode) || 'large-grid';
+    } catch {
+      return 'large-grid';
+    }
   });
 
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
-    localStorage.setItem('inventaire_view_mode', mode);
+    try {
+      localStorage.setItem('inventaire_view_mode', mode);
+    } catch {
+      // Ignore les erreurs de quota ou de politique de sécurité
+    }
   };
 
   // Tri sélectionné
@@ -125,6 +137,7 @@ export const InventoryPage: React.FC = () => {
     setSearchQuery('');
     setSelectedCategory(null);
     setSelectedResidence(null);
+    setSelectedTag(null);
     setFilters({
       search: '',
       category: null,
@@ -137,6 +150,7 @@ export const InventoryPage: React.FC = () => {
       hasPackaging: false,
       hasAccessories: false,
       hasInvoice: false,
+      tag: null,
     });
   };
 
@@ -187,6 +201,14 @@ export const InventoryPage: React.FC = () => {
       // Filtre facture
       if (filters.hasInvoice) {
         if (!item.mediaIds || item.mediaIds.length === 0) return false;
+      }
+
+      // Filtre transversal par Étiquette / Tag
+      if (selectedTag) {
+        const hasTag = item.tags?.some(
+          (t) => t.trim().toLowerCase() === selectedTag.toLowerCase()
+        );
+        if (!hasTag) return false;
       }
 
       // Recherche globale (Omnibar)
@@ -326,6 +348,7 @@ export const InventoryPage: React.FC = () => {
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
         <button
           onClick={() => {
+            setSelectedTag(null);
             setFilters({
               ...filters,
               status: 'all',
@@ -338,7 +361,8 @@ export const InventoryPage: React.FC = () => {
             filters.status === 'all' &&
             filters.warranty === 'all' &&
             !filters.hasPackaging &&
-            !filters.hasAccessories
+            !filters.hasAccessories &&
+            !selectedTag
               ? 'bg-[#1d1d1f] text-white'
               : 'bg-white text-[#555558] hover:bg-[#f5f5f7] border border-black/[0.06]'
           }`}
@@ -411,9 +435,67 @@ export const InventoryPage: React.FC = () => {
         </button>
       </div>
 
+      {/* Ruban d'étiquettes transversales (Tags) */}
+      {allTags.length > 0 && (
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          <span className="text-[11px] font-semibold text-[#86868b] uppercase tracking-wider shrink-0 mr-1 flex items-center gap-1">
+            <Hash className="w-3 h-3 text-[#0071e3]" />
+            <span>Étiquettes :</span>
+          </span>
+
+          <button
+            onClick={() => setSelectedTag(null)}
+            className={`px-2.5 py-1 rounded-full text-xs font-medium shrink-0 transition cursor-pointer ${
+              !selectedTag
+                ? 'bg-[#1d1d1f] text-white shadow-2xs'
+                : 'bg-white hover:bg-[#f5f5f7] text-[#555558] border border-black/[0.06]'
+            }`}
+          >
+            Toutes
+          </button>
+
+          {allTags.map(({ name, count }) => {
+            const isSelected = selectedTag === name;
+            return (
+              <button
+                key={name}
+                onClick={() => setSelectedTag(isSelected ? null : name)}
+                className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium shrink-0 transition cursor-pointer ${
+                  isSelected
+                    ? 'bg-[#0071e3] text-white shadow-xs font-semibold'
+                    : 'bg-white hover:bg-[#f5f5f7] text-[#1d1d1f] border border-black/[0.06]'
+                }`}
+              >
+                <span>#{name}</span>
+                <span
+                  className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                    isSelected ? 'bg-white/20 text-white' : 'bg-black/[0.05] text-[#86868b]'
+                  }`}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {/* Barre de pilules des filtres actifs */}
-      {(searchQuery || activeFiltersCount > 0) && (
+      {(searchQuery || activeFiltersCount > 0 || selectedTag) && (
         <div className="flex flex-wrap items-center gap-1.5 pt-1">
+          {selectedTag && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-[#0071e3] text-white shadow-2xs font-semibold">
+              <Hash className="w-3 h-3" />
+              <span>Étiquette : #{selectedTag}</span>
+              <button
+                onClick={() => setSelectedTag(null)}
+                className="hover:opacity-75 cursor-pointer ml-0.5"
+                title="Supprimer le filtre d'étiquette"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          )}
           {searchQuery && (
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-white border border-black/[0.08] text-[#1d1d1f] shadow-2xs">
               <span>Recherche : « {searchQuery} »</span>

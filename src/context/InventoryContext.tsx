@@ -12,6 +12,33 @@ import {
 import { seedSampleData } from '../services/sampleData';
 import { ConfirmDialogOptions } from '../components/common/ConfirmModal';
 
+// Fonctions d'accès sécurisé à localStorage (évite les plantages en iframe ou navigation privée stricte)
+function safeGetStorage(key: string): string | null {
+  try {
+    return typeof window !== 'undefined' && window.localStorage ? window.localStorage.getItem(key) : null;
+  } catch {
+    return null;
+  }
+}
+
+function safeSetStorage(key: string, value: string): void {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem(key, value);
+    }
+  } catch {
+    // Ignore les erreurs de quota ou de permission en iframe sécurisée
+  }
+}
+
+function safeRemoveStorage(key: string): void {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.removeItem(key);
+    }
+  } catch {}
+}
+
 interface InventoryContextType {
   items: InventoryItem[];
   loading: boolean;
@@ -21,6 +48,9 @@ interface InventoryContextType {
   setSelectedCategory: (category: string | null) => void;
   selectedResidence: string | null;
   setSelectedResidence: (residence: string | null) => void;
+  selectedTag: string | null;
+  setSelectedTag: (tag: string | null) => void;
+  allTags: Array<{ name: string; count: number }>;
   selectedStatus: ItemStatus | 'all';
   setSelectedStatus: (status: ItemStatus | 'all') => void;
   settings: AppSettings | null;
@@ -69,6 +99,7 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedResidence, setSelectedResidence] = useState<string | null>(null);
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<ItemStatus | 'all'>('all');
 
   // Modal de formulaire Ajout/Édition
@@ -107,6 +138,25 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setItemToEdit(null);
   };
 
+  // Liste globale dédoublée de tous les tags existants avec leur fréquence
+  const allTags = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const item of items) {
+      if (item.status === 'archive') continue;
+      if (item.tags && Array.isArray(item.tags)) {
+        for (const t of item.tags) {
+          const clean = t.trim().toLowerCase();
+          if (clean) {
+            map[clean] = (map[clean] || 0) + 1;
+          }
+        }
+      }
+    }
+    return Object.entries(map)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+  }, [items]);
+
   const refreshInventory = async () => {
     try {
       setLoading(true);
@@ -116,10 +166,10 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       ]);
 
       // Uniquement au tout premier chargement vierge initial de l'application (jamais si la base a été vidée)
-      const hasVisited = localStorage.getItem('inventaire_app_visited');
-      const isExplicitlyCleared = localStorage.getItem('inventaire_db_cleared') === 'true';
+      const hasVisited = safeGetStorage('inventaire_app_visited');
+      const isExplicitlyCleared = safeGetStorage('inventaire_db_cleared') === 'true';
       if (!hasVisited && !isExplicitlyCleared && fetchedItems.length === 0) {
-        localStorage.setItem('inventaire_app_visited', 'true');
+        safeSetStorage('inventaire_app_visited', 'true');
         await seedSampleData();
         fetchedItems = await getAllItems();
       }
@@ -136,13 +186,14 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const clearDatabase = async () => {
     try {
       // Marquer explicitement que la base a été vidée pour empêcher tout auto-seeding
-      localStorage.setItem('inventaire_app_visited', 'true');
-      localStorage.setItem('inventaire_db_cleared', 'true');
+      safeSetStorage('inventaire_app_visited', 'true');
+      safeSetStorage('inventaire_db_cleared', 'true');
       
       // Réinitialisation immédiate du state React
       setItems([]);
       setSelectedCategory(null);
       setSelectedResidence(null);
+      setSelectedTag(null);
       setSearchQuery('');
 
       await clearEntireDatabase();
@@ -184,8 +235,8 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const seedDemoData = async () => {
-    localStorage.removeItem('inventaire_db_cleared');
-    localStorage.setItem('inventaire_app_visited', 'true');
+    safeRemoveStorage('inventaire_db_cleared');
+    safeSetStorage('inventaire_app_visited', 'true');
     await seedSampleData();
     await refreshInventory();
   };
@@ -245,6 +296,9 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setSelectedCategory,
         selectedResidence,
         setSelectedResidence,
+        selectedTag,
+        setSelectedTag,
+        allTags,
         selectedStatus,
         setSelectedStatus,
         settings,

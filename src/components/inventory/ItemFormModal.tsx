@@ -20,6 +20,7 @@ import {
   Layers,
   Box,
   Package,
+  Hash,
 } from 'lucide-react';
 import {
   InventoryItem,
@@ -58,7 +59,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
   itemToEdit,
   onSaved,
 }) => {
-  const { items, settings, refreshInventory, deleteItemById, requestConfirmation } = useInventory();
+  const { items, settings, allTags, refreshInventory, deleteItemById, requestConfirmation } = useInventory();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Onglet actif du formulaire
@@ -268,13 +269,16 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
     }
   };
 
-  const handleAddTag = () => {
-    if (!tagInput.trim()) return;
-    const clean = tagInput.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+  const handleAddTag = (tagToAdd?: string) => {
+    const raw = typeof tagToAdd === 'string' ? tagToAdd : tagInput;
+    if (!raw.trim()) return;
+    const clean = raw.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
     if (clean && !tags.includes(clean)) {
       setTags([...tags, clean]);
     }
-    setTagInput('');
+    if (typeof tagToAdd !== 'string') {
+      setTagInput('');
+    }
   };
 
   const handleRemoveTag = (tToRemove: string) => {
@@ -610,6 +614,88 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                             className="w-full px-3 py-2 text-xs rounded-xl bg-white border border-amber-500/30 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
                           />
                         </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Étiquettes & Mots-clés transversaux */}
+                <div className="pt-3 border-t border-black/[0.05] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold text-[#1d1d1f] flex items-center gap-1.5">
+                      <Hash className="w-3.5 h-3.5 text-[#0071e3]" />
+                      <span>Étiquettes transversales (Tags)</span>
+                    </label>
+                    <span className="text-[10px] text-[#86868b]">
+                      Améliore la recherche et la catégorisation croisée
+                    </span>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ',') {
+                          e.preventDefault();
+                          handleAddTag();
+                        }
+                      }}
+                      placeholder="Ajouter une étiquette (ex: gaming, nomade, photo)..."
+                      className="flex-1 px-3.5 py-2 text-xs rounded-xl bg-[#f5f5f7] border border-black/[0.08] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleAddTag()}
+                      className="px-3.5 py-2 rounded-xl bg-[#f5f5f7] hover:bg-[#ebebee] text-[#1d1d1f] text-xs font-medium border border-black/[0.08] cursor-pointer"
+                    >
+                      Ajouter
+                    </button>
+                  </div>
+
+                  {/* Tags attachés à l'objet */}
+                  {tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {tags.map((t) => (
+                        <span
+                          key={t}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] bg-[#0071e3]/10 text-[#0071e3] font-medium border border-[#0071e3]/20"
+                        >
+                          <span>#{t}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveTag(t)}
+                            className="text-[#0071e3]/70 hover:text-rose-600 cursor-pointer"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Suggestions en un clic issues des autres objets */}
+                  {allTags.length > 0 && (
+                    <div className="pt-1.5">
+                      <span className="text-[10px] font-semibold text-[#86868b] uppercase tracking-wider block mb-1">
+                        Étiquettes existantes (cliquer pour ajouter) :
+                      </span>
+                      <div className="flex flex-wrap gap-1 max-h-20 overflow-y-auto">
+                        {allTags
+                          .filter((t) => !tags.includes(t.name))
+                          .slice(0, 16)
+                          .map(({ name, count }) => (
+                            <button
+                              key={name}
+                              type="button"
+                              onClick={() => handleAddTag(name)}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] bg-black/[0.04] hover:bg-[#0071e3]/10 hover:text-[#0071e3] text-[#555558] transition cursor-pointer"
+                            >
+                              <span>+{name}</span>
+                              <span className="text-[9px] text-[#86868b]">({count})</span>
+                            </button>
+                          ))}
                       </div>
                     </div>
                   )}
@@ -1219,7 +1305,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     />
                     <button
                       type="button"
-                      onClick={handleAddTag}
+                      onClick={() => handleAddTag()}
                       className="px-3.5 py-2 rounded-xl bg-[#f5f5f7] hover:bg-[#ebebee] text-[#1d1d1f] text-xs font-medium border border-black/[0.08] cursor-pointer"
                     >
                       Ajouter

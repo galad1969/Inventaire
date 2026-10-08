@@ -14,7 +14,7 @@ export const LargeGridView: React.FC<LargeGridViewProps> = ({
   mediaUrls,
   onItemClick,
 }) => {
-  const { openEditModal, deleteItemById, requestConfirmation } = useInventory();
+  const { openEditModal, deleteItemById, requestConfirmation, setSelectedTag } = useInventory();
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
       {items.map((item) => {
@@ -102,6 +102,25 @@ export const LargeGridView: React.FC<LargeGridViewProps> = ({
                   <span>
                     {item.relations.length} liaison{item.relations.length > 1 ? 's' : ''} (accessoire / boîte)
                   </span>
+                </div>
+              )}
+
+              {/* Étiquettes / Tags transversaux */}
+              {item.tags && item.tags.length > 0 && (
+                <div
+                  className="mt-2.5 flex flex-wrap gap-1"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {item.tags.map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setSelectedTag(t.trim().toLowerCase())}
+                      className="text-[10px] px-2 py-0.5 rounded-md bg-black/[0.04] hover:bg-[#0071e3]/10 hover:text-[#0071e3] text-[#555558] transition cursor-pointer"
+                      title={`Filtrer par #${t}`}
+                    >
+                      #{t}
+                    </button>
+                  ))}
                 </div>
               )}
             </div>

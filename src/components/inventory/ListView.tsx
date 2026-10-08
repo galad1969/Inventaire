@@ -28,7 +28,7 @@ export const ListView: React.FC<ListViewProps> = ({
   sortOption,
   onSortChange,
 }) => {
-  const { openEditModal, deleteItemById, requestConfirmation } = useInventory();
+  const { openEditModal, deleteItemById, requestConfirmation, setSelectedTag } = useInventory();
   const today = new Date().toISOString().slice(0, 10);
 
   const toggleSort = (field: 'name' | 'price' | 'date') => {
@@ -107,12 +107,29 @@ export const ListView: React.FC<ListViewProps> = ({
                     <div className="font-semibold text-[#1d1d1f] group-hover:text-[#0071e3] transition-colors line-clamp-1">
                       {item.name}
                     </div>
-                    <div className="text-[11px] text-[#86868b] flex items-center gap-1.5">
+                    <div className="text-[11px] text-[#86868b] flex items-center gap-1.5 flex-wrap">
                       <span>{item.brand || 'Sans marque'}</span>
                       {item.model && <span>• {item.model}</span>}
                       {item.relations && item.relations.length > 0 && (
                         <span className="text-[10px] text-[#0071e3] font-medium">
                           ({item.relations.length} liaison{item.relations.length > 1 ? 's' : ''})
+                        </span>
+                      )}
+                      {item.tags && item.tags.length > 0 && (
+                        <span className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                          {item.tags.slice(0, 3).map((t) => (
+                            <button
+                              key={t}
+                              onClick={() => setSelectedTag(t.trim().toLowerCase())}
+                              className="text-[9px] px-1.5 py-0.2 rounded bg-black/[0.04] hover:bg-[#0071e3]/10 hover:text-[#0071e3] text-[#555558] transition cursor-pointer"
+                              title={`Filtrer par #${t}`}
+                            >
+                              #{t}
+                            </button>
+                          ))}
+                          {item.tags.length > 3 && (
+                            <span className="text-[9px] text-[#86868b]">+{item.tags.length - 3}</span>
+                          )}
                         </span>
                       )}
                     </div>

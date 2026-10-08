@@ -29,7 +29,7 @@ export const ItemQuickViewModal: React.FC<ItemQuickViewModalProps> = ({
   item,
   onClose,
 }) => {
-  const { openEditModal, deleteItemById, archiveItemById, requestConfirmation } = useInventory();
+  const { openEditModal, deleteItemById, archiveItemById, requestConfirmation, setSelectedTag } = useInventory();
   const [mediaList, setMediaList] = useState<MediaItem[]>([]);
   const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
   const [loadingMedia, setLoadingMedia] = useState<boolean>(true);
@@ -377,12 +377,17 @@ export const ItemQuickViewModal: React.FC<ItemQuickViewModalProps> = ({
                 {item.tags && item.tags.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 pt-1">
                     {item.tags.map((t) => (
-                      <span
+                      <button
                         key={t}
-                        className="text-[10px] px-2 py-0.5 rounded-full bg-[#f5f5f7] text-[#555558] border border-black/[0.04]"
+                        onClick={() => {
+                          setSelectedTag(t.trim().toLowerCase());
+                          onClose();
+                        }}
+                        className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#f5f5f7] hover:bg-[#0071e3]/10 hover:text-[#0071e3] text-[#555558] border border-black/[0.04] transition cursor-pointer flex items-center gap-0.5"
+                        title={`Filtrer par l'étiquette #${t}`}
                       >
-                        #{t}
-                      </span>
+                        <span>#{t}</span>
+                      </button>
                     ))}
                   </div>
                 )}

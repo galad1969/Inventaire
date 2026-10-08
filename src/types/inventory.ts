@@ -114,6 +114,7 @@ export interface FilterState {
   hasPackaging?: boolean;
   hasAccessories?: boolean;
   hasInvoice?: boolean;
+  tag?: string | null;
 }
 
 export interface FullBackupExport {

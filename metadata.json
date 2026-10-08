@@ -2,5 +2,7 @@
   "name": "Inventaire Privé",
   "description": "Application web de gestion d'inventaire personnel hors-ligne (Offline-first) inspirée de Geekpratique, avec IndexedDB et import/export JSON complet.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

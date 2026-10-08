@@ -14,7 +14,7 @@ export const CompactGridView: React.FC<CompactGridViewProps> = ({
   mediaUrls,
   onItemClick,
 }) => {
-  const { openEditModal, deleteItemById, requestConfirmation } = useInventory();
+  const { openEditModal, deleteItemById, requestConfirmation, setSelectedTag } = useInventory();
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5">
@@ -93,6 +93,28 @@ export const CompactGridView: React.FC<CompactGridViewProps> = ({
                 <MapPin className="w-2.5 h-2.5 shrink-0 text-[#0071e3]" />
                 <span className="truncate">{item.location.room} • {item.location.subLocation}</span>
               </div>
+
+              {/* Tags */}
+              {item.tags && item.tags.length > 0 && (
+                <div
+                  className="mt-1 flex items-center gap-1 overflow-hidden"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {item.tags.slice(0, 2).map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setSelectedTag(t.trim().toLowerCase())}
+                      className="text-[9px] px-1 py-0.2 rounded bg-black/[0.04] hover:bg-[#0071e3]/10 hover:text-[#0071e3] text-[#555558] truncate transition cursor-pointer"
+                      title={`Filtrer par #${t}`}
+                    >
+                      #{t}
+                    </button>
+                  ))}
+                  {item.tags.length > 2 && (
+                    <span className="text-[9px] text-[#86868b]">+{item.tags.length - 2}</span>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Price & Condition */}
