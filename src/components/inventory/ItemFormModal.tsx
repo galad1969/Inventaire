@@ -680,12 +680,12 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                         }
                       }}
                       placeholder="Ajouter une étiquette (ex: gaming, nomade, photo)..."
-                      className="flex-1 px-3.5 py-2 text-xs rounded-xl bg-[#f5f5f7] border border-black/[0.08] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
+                      className="flex-1 px-3.5 py-2 text-xs rounded-xl bg-[#f5f5f7] dark:bg-[#252528] border border-black/[0.08] dark:border-white/[0.1] text-[#1d1d1f] dark:text-[#f5f5f7] placeholder:text-[#86868b] dark:placeholder:text-[#636366] focus:bg-white dark:focus:bg-[#1c1c1e] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
                     />
                     <button
                       type="button"
                       onClick={() => handleAddTag()}
-                      className="px-3.5 py-2 rounded-xl bg-[#f5f5f7] hover:bg-[#ebebee] text-[#1d1d1f] text-xs font-medium border border-black/[0.08] cursor-pointer"
+                      className="px-3.5 py-2 rounded-xl bg-[#f5f5f7] dark:bg-[#252528] hover:bg-[#ebebee] dark:hover:bg-[#2c2c30] text-[#1d1d1f] dark:text-[#f5f5f7] text-xs font-medium border border-black/[0.08] dark:border-white/[0.1] cursor-pointer"
                     >
                       Ajouter
                     </button>
@@ -752,14 +752,14 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
 
                 {/* Niveau 1 : Résidence */}
                 <div>
-                  <label className="text-xs font-semibold text-[#1d1d1f] block mb-1">
+                  <label className="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] block mb-1">
                     Niveau 1 : Résidence / Bâtiment <span className="text-rose-500">*</span>
                   </label>
                   <div className="flex gap-2">
                     <select
                       value={residence}
                       onChange={(e) => setResidence(e.target.value)}
-                      className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] border border-black/[0.08] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 cursor-pointer"
+                      className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] dark:bg-[#252528] border border-black/[0.08] dark:border-white/[0.1] text-[#1d1d1f] dark:text-[#f5f5f7] focus:bg-white dark:focus:bg-[#1c1c1e] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 cursor-pointer"
                     >
                       {existingSuggestions.residences.map((r) => (
                         <option key={r} value={r}>
@@ -772,14 +772,14 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                       placeholder="Ou nouvelle résidence..."
                       value={residence}
                       onChange={(e) => setResidence(e.target.value)}
-                      className="w-full px-3 py-2 text-xs rounded-xl bg-[#f5f5f7] border border-black/[0.08] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
+                      className="w-full px-3 py-2 text-xs rounded-xl bg-[#f5f5f7] dark:bg-[#252528] border border-black/[0.08] dark:border-white/[0.1] text-[#1d1d1f] dark:text-[#f5f5f7] placeholder:text-[#86868b] dark:placeholder:text-[#636366] focus:bg-white dark:focus:bg-[#1c1c1e] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
                     />
                   </div>
                 </div>
 
                 {/* Niveau 2 : Pièce */}
                 <div>
-                  <label className="text-xs font-semibold text-[#1d1d1f] block mb-1">
+                  <label className="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] block mb-1">
                     Niveau 2 : Pièce
                   </label>
                   <input
@@ -787,17 +787,17 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     value={room}
                     onChange={(e) => setRoom(e.target.value)}
                     placeholder="Ex: Bureau, Salon, Chambre parents, Garage, Grenier..."
-                    className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] border border-black/[0.08] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
+                    className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] dark:bg-[#252528] border border-black/[0.08] dark:border-white/[0.1] text-[#1d1d1f] dark:text-[#f5f5f7] placeholder:text-[#86868b] dark:placeholder:text-[#636366] focus:bg-white dark:focus:bg-[#1c1c1e] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
                   />
                   {existingSuggestions.rooms.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-2">
-                      <span className="text-[10px] text-[#86868b] mr-1">Suggestions :</span>
+                      <span className="text-[10px] text-[#86868b] dark:text-[#8e8e93] mr-1">Suggestions :</span>
                       {existingSuggestions.rooms.slice(0, 6).map((rm) => (
                         <button
                           type="button"
                           key={rm}
                           onClick={() => setRoom(rm)}
-                          className="text-[10px] px-2 py-0.5 rounded-full bg-black/[0.04] text-[#555558] hover:bg-[#0071e3]/10 hover:text-[#0071e3] transition cursor-pointer"
+                          className="text-[10px] px-2 py-0.5 rounded-full bg-black/[0.04] dark:bg-white/[0.08] text-[#555558] dark:text-[#a1a1a6] hover:bg-[#0071e3]/10 hover:text-[#0071e3] transition cursor-pointer"
                         >
                           {rm}
                         </button>
@@ -808,7 +808,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
 
                 {/* Niveau 3 : Meuble */}
                 <div>
-                  <label className="text-xs font-semibold text-[#1d1d1f] block mb-1">
+                  <label className="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] block mb-1">
                     Niveau 3 : Meuble / Support
                   </label>
                   <input
@@ -816,17 +816,17 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     value={furniture}
                     onChange={(e) => setFurniture(e.target.value)}
                     placeholder="Ex: Armoire vitrée, Bureau d'angle, Étagère métallique Nord..."
-                    className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] border border-black/[0.08] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
+                    className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] dark:bg-[#252528] border border-black/[0.08] dark:border-white/[0.1] text-[#1d1d1f] dark:text-[#f5f5f7] placeholder:text-[#86868b] dark:placeholder:text-[#636366] focus:bg-white dark:focus:bg-[#1c1c1e] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
                   />
                   {existingSuggestions.furnitures.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-2">
-                      <span className="text-[10px] text-[#86868b] mr-1">Suggestions :</span>
+                      <span className="text-[10px] text-[#86868b] dark:text-[#8e8e93] mr-1">Suggestions :</span>
                       {existingSuggestions.furnitures.slice(0, 6).map((fn) => (
                         <button
                           type="button"
                           key={fn}
                           onClick={() => setFurniture(fn)}
-                          className="text-[10px] px-2 py-0.5 rounded-full bg-black/[0.04] text-[#555558] hover:bg-[#0071e3]/10 hover:text-[#0071e3] transition cursor-pointer"
+                          className="text-[10px] px-2 py-0.5 rounded-full bg-black/[0.04] dark:bg-white/[0.08] text-[#555558] dark:text-[#a1a1a6] hover:bg-[#0071e3]/10 hover:text-[#0071e3] transition cursor-pointer"
                         >
                           {fn}
                         </button>
@@ -837,7 +837,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
 
                 {/* Niveau 4 : Sous-emplacement / Tiroir */}
                 <div>
-                  <label className="text-xs font-semibold text-[#1d1d1f] block mb-1">
+                  <label className="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] block mb-1">
                     Niveau 4 : Sous-emplacement précis (Tiroir, Boîte, Étagère)
                   </label>
                   <input
@@ -845,7 +845,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     value={subLocation}
                     onChange={(e) => setSubLocation(e.target.value)}
                     placeholder="Ex: Tiroir du haut, Carton #4, Boîte anti-humidité, Casier 2..."
-                    className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] border border-black/[0.08] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 font-mono text-[#0071e3]"
+                    className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] dark:bg-[#252528] border border-black/[0.08] dark:border-white/[0.1] focus:bg-white dark:focus:bg-[#1c1c1e] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 font-mono text-[#0071e3] dark:text-[#0a84ff]"
                   />
                 </div>
               </div>
@@ -856,7 +856,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="sm:col-span-2">
-                    <label className="text-xs font-semibold text-[#1d1d1f] block mb-1">
+                    <label className="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] block mb-1">
                       Prix d'achat TTC
                     </label>
                     <div className="relative flex items-center">
@@ -867,22 +867,22 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                         value={purchasePrice}
                         onChange={(e) => setPurchasePrice(e.target.value)}
                         placeholder="0.00"
-                        className="w-full pl-3.5 pr-14 py-2.5 text-xs rounded-xl bg-[#f5f5f7] border border-black/[0.08] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 font-semibold"
+                        className="w-full pl-3.5 pr-14 py-2.5 text-xs rounded-xl bg-[#f5f5f7] dark:bg-[#252528] border border-black/[0.08] dark:border-white/[0.1] text-[#1d1d1f] dark:text-[#f5f5f7] placeholder:text-[#86868b] dark:placeholder:text-[#636366] focus:bg-white dark:focus:bg-[#1c1c1e] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 font-semibold"
                       />
-                      <span className="absolute right-3.5 text-xs font-semibold text-[#86868b]">
+                      <span className="absolute right-3.5 text-xs font-semibold text-[#86868b] dark:text-[#8e8e93]">
                         {currency}
                       </span>
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-[#1d1d1f] block mb-1">
+                    <label className="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] block mb-1">
                       Devise
                     </label>
                     <select
                       value={currency}
                       onChange={(e) => setCurrency(e.target.value)}
-                      className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] border border-black/[0.08] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 cursor-pointer"
+                      className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] dark:bg-[#252528] border border-black/[0.08] dark:border-white/[0.1] text-[#1d1d1f] dark:text-[#f5f5f7] focus:bg-white dark:focus:bg-[#1c1c1e] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 cursor-pointer"
                     >
                       <option value="EUR">EUR (€)</option>
                       <option value="USD">USD ($)</option>
@@ -893,45 +893,45 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-[#1d1d1f] block mb-1">
+                  <label className="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] block mb-1">
                     Date d'acquisition / d'achat
                   </label>
                   <input
                     type="date"
                     value={purchaseDate}
                     onChange={(e) => setPurchaseDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] border border-black/[0.08] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 cursor-pointer"
+                    className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] dark:bg-[#252528] border border-black/[0.08] dark:border-white/[0.1] text-[#1d1d1f] dark:text-[#f5f5f7] focus:bg-white dark:focus:bg-[#1c1c1e] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 cursor-pointer"
                   />
                 </div>
 
-                <div className="pt-3 border-t border-black/[0.05]">
+                <div className="pt-3 border-t border-black/[0.05] dark:border-white/[0.08]">
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs font-semibold text-[#1d1d1f] flex items-center gap-1.5">
-                      <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    <label className="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] flex items-center gap-1.5">
+                      <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                       <span>Date de fin de garantie</span>
                     </label>
 
                     {/* Boutons rapides pour la garantie */}
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] text-[#86868b]">Ajouter :</span>
+                      <span className="text-[10px] text-[#86868b] dark:text-[#8e8e93]">Ajouter :</span>
                       <button
                         type="button"
                         onClick={() => handleAddWarrantyYears(1)}
-                        className="text-[10px] px-2 py-0.5 rounded-lg bg-black/[0.04] hover:bg-[#0071e3]/10 hover:text-[#0071e3] transition cursor-pointer"
+                        className="text-[10px] px-2 py-0.5 rounded-lg bg-black/[0.04] dark:bg-white/[0.08] text-[#555558] dark:text-[#a1a1a6] hover:bg-[#0071e3]/10 hover:text-[#0071e3] transition cursor-pointer"
                       >
                         +1 an
                       </button>
                       <button
                         type="button"
                         onClick={() => handleAddWarrantyYears(2)}
-                        className="text-[10px] px-2 py-0.5 rounded-lg bg-black/[0.04] hover:bg-[#0071e3]/10 hover:text-[#0071e3] transition cursor-pointer font-medium"
+                        className="text-[10px] px-2 py-0.5 rounded-lg bg-black/[0.04] dark:bg-white/[0.08] text-[#555558] dark:text-[#a1a1a6] hover:bg-[#0071e3]/10 hover:text-[#0071e3] transition cursor-pointer font-medium"
                       >
                         +2 ans (légal)
                       </button>
                       <button
                         type="button"
                         onClick={() => handleAddWarrantyYears(5)}
-                        className="text-[10px] px-2 py-0.5 rounded-lg bg-black/[0.04] hover:bg-[#0071e3]/10 hover:text-[#0071e3] transition cursor-pointer"
+                        className="text-[10px] px-2 py-0.5 rounded-lg bg-black/[0.04] dark:bg-white/[0.08] text-[#555558] dark:text-[#a1a1a6] hover:bg-[#0071e3]/10 hover:text-[#0071e3] transition cursor-pointer"
                       >
                         +5 ans
                       </button>
@@ -942,7 +942,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     type="date"
                     value={warrantyEndDate}
                     onChange={(e) => setWarrantyEndDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] border border-black/[0.08] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 cursor-pointer"
+                    className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] dark:bg-[#252528] border border-black/[0.08] dark:border-white/[0.1] text-[#1d1d1f] dark:text-[#f5f5f7] focus:bg-white dark:focus:bg-[#1c1c1e] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 cursor-pointer"
                   />
                 </div>
               </div>
@@ -996,9 +996,9 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
 
                       {/* Aperçu de la photo d'illustration active */}
                       {primaryPhotoDraft ? (
-                        <div className="p-3.5 rounded-2xl bg-white border border-[#0071e3]/30 shadow-2xs flex items-center justify-between gap-3">
+                        <div className="p-3.5 rounded-2xl bg-white dark:bg-[#1c1c1e] border border-[#0071e3]/30 dark:border-[#0a84ff]/40 shadow-2xs flex items-center justify-between gap-3">
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-16 h-16 rounded-xl bg-[#f5f5f7] border border-black/[0.06] overflow-hidden shrink-0 flex items-center justify-center relative">
+                            <div className="w-16 h-16 rounded-xl bg-[#f5f5f7] dark:bg-[#2c2c2e] border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shrink-0 flex items-center justify-center relative">
                               {primaryPhotoDraft.previewUrl ? (
                                 <img
                                   src={primaryPhotoDraft.previewUrl}
@@ -1013,14 +1013,14 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                               </div>
                             </div>
                             <div className="min-w-0">
-                              <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-800">
-                                <Star className="w-3 h-3 fill-amber-500 text-amber-600" />
+                              <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-400">
+                                <Star className="w-3 h-3 fill-amber-500 text-amber-600 dark:text-amber-400" />
                                 Illustration par défaut active
                               </span>
-                              <span className="text-xs font-semibold text-[#1d1d1f] block truncate mt-1">
+                              <span className="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] block truncate mt-1">
                                 {primaryPhotoDraft.name}
                               </span>
-                              <span className="text-[10px] text-[#86868b]">
+                              <span className="text-[10px] text-[#86868b] dark:text-[#8e8e93]">
                                 {(primaryPhotoDraft.size / 1024).toFixed(0)} Ko • Image
                               </span>
                             </div>
@@ -1030,14 +1030,14 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                             <button
                               type="button"
                               onClick={() => primaryFileInputRef.current?.click()}
-                              className="px-3 py-1.5 rounded-xl bg-[#f5f5f7] hover:bg-[#ebebee] text-[#1d1d1f] text-xs font-medium transition cursor-pointer"
+                              className="px-3 py-1.5 rounded-xl bg-[#f5f5f7] dark:bg-[#2c2c2e] hover:bg-[#ebebee] dark:hover:bg-[#3a3a3c] text-[#1d1d1f] dark:text-[#f5f5f7] text-xs font-medium transition cursor-pointer"
                             >
                               Changer
                             </button>
                             <button
                               type="button"
                               onClick={() => setPrimaryPhotoId(undefined)}
-                              className="p-1.5 rounded-xl text-[#86868b] hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
+                              className="p-1.5 rounded-xl text-[#86868b] hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition cursor-pointer"
                               title="Désélectionner comme illustration"
                             >
                               <X className="w-4 h-4" />
@@ -1047,13 +1047,13 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                       ) : (
                         <div
                           onClick={() => primaryFileInputRef.current?.click()}
-                          className="p-4 rounded-2xl border border-dashed border-black/[0.12] hover:border-[#0071e3]/50 bg-white/70 hover:bg-white text-center cursor-pointer transition flex flex-col items-center justify-center gap-1.5 group"
+                          className="p-4 rounded-2xl border border-dashed border-black/[0.12] dark:border-white/[0.15] hover:border-[#0071e3]/50 dark:hover:border-[#0a84ff]/50 bg-white/70 dark:bg-white/[0.03] hover:bg-white dark:hover:bg-white/[0.06] text-center cursor-pointer transition flex flex-col items-center justify-center gap-1.5 group"
                         >
-                          <Camera className="w-6 h-6 text-[#86868b] group-hover:text-[#0071e3] transition-colors" />
-                          <span className="text-xs font-semibold text-[#1d1d1f]">
+                          <Camera className="w-6 h-6 text-[#86868b] group-hover:text-[#0071e3] dark:group-hover:text-[#0a84ff] transition-colors" />
+                          <span className="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7]">
                             Aucune photo d'illustration définie
                           </span>
-                          <span className="text-[11px] text-[#86868b]">
+                          <span className="text-[11px] text-[#86868b] dark:text-[#8e8e93]">
                             Cliquez ici pour sélectionner une photo dédiée qui servira d'illustration par défaut
                           </span>
                         </div>
@@ -1093,7 +1093,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     className={`border-2 border-dashed rounded-2xl p-5 text-center cursor-pointer transition-all ${
                       isDragging
                         ? 'border-[#0071e3] bg-[#0071e3]/[0.05]'
-                        : 'border-black/[0.1] hover:border-[#0071e3]/50 bg-[#fbfbfd]'
+                        : 'border-black/[0.1] dark:border-white/[0.12] hover:border-[#0071e3]/50 bg-[#fbfbfd] dark:bg-white/[0.02]'
                     }`}
                   >
                     <input
@@ -1104,14 +1104,14 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                       onChange={(e) => handleFilesAdded(e.target.files)}
                       className="hidden"
                     />
-                    <div className="w-9 h-9 rounded-2xl bg-[#0071e3]/10 text-[#0071e3] flex items-center justify-center mx-auto mb-1.5">
+                    <div className="w-9 h-9 rounded-2xl bg-[#0071e3]/10 text-[#0071e3] dark:text-[#0a84ff] flex items-center justify-center mx-auto mb-1.5">
                       <Upload className="w-4 h-4" />
                     </div>
-                    <p className="text-xs font-semibold text-[#1d1d1f]">
+                    <p className="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7]">
                       Glissez d'autres photos ou factures PDF ici
                     </p>
-                    <p className="text-[11px] text-[#86868b] mt-0.5">
-                      ou <span className="text-[#0071e3] font-medium underline">parcourez vos fichiers</span> (JPEG, PNG, WebP, PDF)
+                    <p className="text-[11px] text-[#86868b] dark:text-[#8e8e93] mt-0.5">
+                      ou <span className="text-[#0071e3] dark:text-[#0a84ff] font-medium underline">parcourez vos fichiers</span> (JPEG, PNG, WebP, PDF)
                     </p>
                   </div>
 
@@ -1127,13 +1127,13 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                             key={draft.id}
                             className={`p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
                               isPrimary
-                                ? 'bg-[#0071e3]/[0.05] border-[#0071e3]/40 ring-1 ring-[#0071e3]/20 shadow-2xs'
-                                : 'bg-[#fbfbfd] border-black/[0.06] hover:bg-white'
+                                ? 'bg-[#0071e3]/[0.05] dark:bg-[#0a84ff]/10 border-[#0071e3]/40 dark:border-[#0a84ff]/40 ring-1 ring-[#0071e3]/20 shadow-2xs'
+                                : 'bg-[#fbfbfd] dark:bg-[#202023] border-black/[0.06] dark:border-white/[0.08] hover:bg-white dark:hover:bg-[#26262a]'
                             }`}
                           >
                             <div className="flex items-center gap-3 truncate">
                               {/* Miniature ou icône PDF */}
-                              <div className="w-12 h-12 rounded-xl bg-white border border-black/[0.06] overflow-hidden flex items-center justify-center shrink-0 relative">
+                              <div className="w-12 h-12 rounded-xl bg-white dark:bg-[#2c2c2e] border border-black/[0.06] dark:border-white/[0.08] overflow-hidden flex items-center justify-center shrink-0 relative">
                                 {draft.previewUrl ? (
                                   <img
                                     src={draft.previewUrl}
@@ -1143,7 +1143,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                                 ) : isPdf ? (
                                   <FileText className="w-6 h-6 text-rose-500" />
                                 ) : (
-                                  <ImageIcon className="w-6 h-6 text-[#86868b]" />
+                                  <ImageIcon className="w-6 h-6 text-[#86868b] dark:text-[#8e8e93]" />
                                 )}
                                 {isPrimary && (
                                   <div className="absolute top-0.5 left-0.5 w-3.5 h-3.5 rounded-full bg-amber-500 text-white flex items-center justify-center">
@@ -1153,10 +1153,10 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                               </div>
 
                               <div className="truncate">
-                                <span className="font-semibold text-xs text-[#1d1d1f] block truncate">
+                                <span className="font-semibold text-xs text-[#1d1d1f] dark:text-[#f5f5f7] block truncate">
                                   {draft.name}
                                 </span>
-                                <span className="text-[10px] text-[#86868b]">
+                                <span className="text-[10px] text-[#86868b] dark:text-[#8e8e93]">
                                   {(draft.size / 1024).toFixed(0)} Ko •{' '}
                                   {draft.category === 'invoice' ? 'Facture' : 'Photo'}
                                 </span>
@@ -1175,7 +1175,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                                   <button
                                     type="button"
                                     onClick={() => setPrimaryPhotoId(draft.id)}
-                                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#f5f5f7] hover:bg-[#0071e3]/10 text-[#555558] hover:text-[#0071e3] text-[11px] font-medium transition cursor-pointer"
+                                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#f5f5f7] dark:bg-[#2c2c2e] hover:bg-[#0071e3]/10 dark:hover:bg-[#0a84ff]/20 text-[#555558] dark:text-[#a1a1a6] hover:text-[#0071e3] dark:hover:text-[#0a84ff] text-[11px] font-medium transition cursor-pointer"
                                     title="Définir comme illustration par défaut de cet objet"
                                   >
                                     <Star className="w-3 h-3 text-amber-500" />
@@ -1302,7 +1302,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                         className={`py-2 px-2.5 rounded-xl text-xs font-medium border transition cursor-pointer text-center ${
                           newRelType === t.type
                             ? 'bg-[#0071e3] text-white border-[#0071e3] shadow-xs'
-                            : 'bg-white text-[#1d1d1f] border-black/[0.06] hover:bg-[#ebebee]'
+                            : 'bg-white dark:bg-[#252528] text-[#1d1d1f] dark:text-[#f5f5f7] border-black/[0.06] dark:border-white/[0.08] hover:bg-[#ebebee] dark:hover:bg-[#2c2c2e]'
                         }`}
                       >
                         {t.label}
@@ -1312,7 +1312,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
 
                   {/* Nom / Libellé */}
                   <div>
-                    <label className="text-[11px] font-semibold text-[#1d1d1f] block mb-1">
+                    <label className="text-[11px] font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] block mb-1">
                       Nom de la liaison / description
                     </label>
                     <input
@@ -1324,12 +1324,12 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                           ? 'Ex: Boîte d\'origine complète avec cales et livrets...'
                           : 'Ex: Câble USB-C MagSafe, Télécommande, Batterie supplémentaire...'
                       }
-                      className="w-full px-3 py-2 text-xs rounded-xl bg-white border border-black/[0.08] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
+                      className="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-[#252528] text-[#1d1d1f] dark:text-[#f5f5f7] border border-black/[0.08] dark:border-white/[0.1] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
                     />
                   </div>
 
                   {/* Option Emplacement personnalisé vs même endroit */}
-                  <div className="space-y-2 pt-1 border-t border-black/[0.05]">
+                  <div className="space-y-2 pt-1 border-t border-black/[0.05] dark:border-white/[0.08]">
                     <div className="flex items-center gap-4 text-xs">
                       <label className="flex items-center gap-1.5 cursor-pointer">
                         <input
@@ -1339,7 +1339,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                           onChange={() => setNewRelIsCustomLocation(false)}
                           className="text-[#0071e3] focus:ring-[#0071e3]"
                         />
-                        <span className="text-[#1d1d1f]">Au même endroit que l'objet principal</span>
+                        <span className="text-[#1d1d1f] dark:text-[#f5f5f7]">Au même endroit que l'objet principal</span>
                       </label>
 
                       <label className="flex items-center gap-1.5 cursor-pointer">
@@ -1350,48 +1350,48 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                           onChange={() => setNewRelIsCustomLocation(true)}
                           className="text-[#0071e3] focus:ring-[#0071e3]"
                         />
-                        <span className="text-[#1d1d1f] font-medium">Localisé ailleurs (Grenier, Cave...)</span>
+                        <span className="text-[#1d1d1f] dark:text-[#f5f5f7] font-medium">Localisé ailleurs (Grenier, Cave...)</span>
                       </label>
                     </div>
 
                     {/* Champs d'emplacement dédié */}
                     {newRelIsCustomLocation && (
-                      <div className="p-3 rounded-xl bg-white border border-black/[0.06] space-y-2.5">
-                        <span className="text-[11px] font-semibold text-[#0071e3] block">
+                      <div className="p-3 rounded-xl bg-white dark:bg-[#252528] border border-black/[0.06] dark:border-white/[0.08] space-y-2.5">
+                        <span className="text-[11px] font-semibold text-[#0071e3] dark:text-[#0a84ff] block">
                           📍 Emplacement dédié de cet emballage / accessoire :
                         </span>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                           <div>
-                            <span className="text-[10px] text-[#86868b] block mb-0.5">Pièce / Espace</span>
+                            <span className="text-[10px] text-[#86868b] dark:text-[#8e8e93] block mb-0.5">Pièce / Espace</span>
                             <input
                               type="text"
                               value={newRelRoom}
                               onChange={(e) => setNewRelRoom(e.target.value)}
                               placeholder="Ex: Grenier, Cave, Garage, Dressing..."
-                              className="w-full px-2.5 py-1.5 text-xs rounded-lg bg-[#f5f5f7] border border-black/[0.06] focus:bg-white focus:outline-none"
+                              className="w-full px-2.5 py-1.5 text-xs rounded-lg bg-[#f5f5f7] dark:bg-[#1e1e20] text-[#1d1d1f] dark:text-[#f5f5f7] border border-black/[0.06] dark:border-white/[0.08] focus:bg-white dark:focus:bg-[#252528] focus:outline-none"
                             />
                           </div>
 
                           <div>
-                            <span className="text-[10px] text-[#86868b] block mb-0.5">Meuble / Rayonnage</span>
+                            <span className="text-[10px] text-[#86868b] dark:text-[#8e8e93] block mb-0.5">Meuble / Rayonnage</span>
                             <input
                               type="text"
                               value={newRelFurniture}
                               onChange={(e) => setNewRelFurniture(e.target.value)}
                               placeholder="Ex: Étagère métallique Nord, Rayonnage A..."
-                              className="w-full px-2.5 py-1.5 text-xs rounded-lg bg-[#f5f5f7] border border-black/[0.06] focus:bg-white focus:outline-none"
+                              className="w-full px-2.5 py-1.5 text-xs rounded-lg bg-[#f5f5f7] dark:bg-[#1e1e20] text-[#1d1d1f] dark:text-[#f5f5f7] border border-black/[0.06] dark:border-white/[0.08] focus:bg-white dark:focus:bg-[#252528] focus:outline-none"
                             />
                           </div>
 
                           <div className="sm:col-span-2">
-                            <span className="text-[10px] text-[#86868b] block mb-0.5">Sous-emplacement / Carton / Tiroir</span>
+                            <span className="text-[10px] text-[#86868b] dark:text-[#8e8e93] block mb-0.5">Sous-emplacement / Carton / Tiroir</span>
                             <input
                               type="text"
                               value={newRelSubLocation}
                               onChange={(e) => setNewRelSubLocation(e.target.value)}
                               placeholder="Ex: Carton #4 'Emballages Hi-Tech', Boîte plastique #2..."
-                              className="w-full px-2.5 py-1.5 text-xs rounded-lg bg-[#f5f5f7] border border-black/[0.06] focus:bg-white focus:outline-none font-mono text-[#0071e3]"
+                              className="w-full px-2.5 py-1.5 text-xs rounded-lg bg-[#f5f5f7] dark:bg-[#1e1e20] text-[#1d1d1f] dark:text-[#f5f5f7] border border-black/[0.06] dark:border-white/[0.08] focus:bg-white dark:focus:bg-[#252528] focus:outline-none font-mono text-[#0071e3] dark:text-[#0a84ff]"
                             />
                           </div>
                         </div>
@@ -1437,23 +1437,23 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
             {activeTab === 'notes' && (
               <div className="space-y-4">
                 <div>
-                  <label className="text-xs font-semibold text-[#1d1d1f] block mb-1">
+                  <label className="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] block mb-1">
                     Lien externe vers la notice constructeur (URL)
                   </label>
                   <div className="relative flex items-center">
-                    <ExternalLink className="w-4 h-4 text-[#86868b] absolute left-3.5 pointer-events-none" />
+                    <ExternalLink className="w-4 h-4 text-[#86868b] dark:text-[#8e8e93] absolute left-3.5 pointer-events-none" />
                     <input
                       type="url"
                       value={manualUrl}
                       onChange={(e) => setManualUrl(e.target.value)}
                       placeholder="https://support.apple.com/... ou https://notice.fr/..."
-                      className="w-full pl-9.5 pr-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] border border-black/[0.08] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
+                      className="w-full pl-9.5 pr-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] dark:bg-[#252528] text-[#1d1d1f] dark:text-[#f5f5f7] border border-black/[0.08] dark:border-white/[0.1] focus:bg-white dark:focus:bg-[#2c2c2e] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-[#1d1d1f] block mb-1">
+                  <label className="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] block mb-1">
                     Mots-clés / Tags
                   </label>
                   <div className="flex gap-2">
@@ -1468,12 +1468,12 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                         }
                       }}
                       placeholder="Ajouter un tag (ex: photo, pro, voyage)..."
-                      className="flex-1 px-3.5 py-2 text-xs rounded-xl bg-[#f5f5f7] border border-black/[0.08] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
+                      className="flex-1 px-3.5 py-2 text-xs rounded-xl bg-[#f5f5f7] dark:bg-[#252528] text-[#1d1d1f] dark:text-[#f5f5f7] border border-black/[0.08] dark:border-white/[0.1] focus:bg-white dark:focus:bg-[#2c2c2e] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
                     />
                     <button
                       type="button"
                       onClick={() => handleAddTag()}
-                      className="px-3.5 py-2 rounded-xl bg-[#f5f5f7] hover:bg-[#ebebee] text-[#1d1d1f] text-xs font-medium border border-black/[0.08] cursor-pointer"
+                      className="px-3.5 py-2 rounded-xl bg-[#f5f5f7] dark:bg-[#252528] hover:bg-[#ebebee] dark:hover:bg-[#2c2c2e] text-[#1d1d1f] dark:text-[#f5f5f7] text-xs font-medium border border-black/[0.08] dark:border-white/[0.1] cursor-pointer"
                     >
                       Ajouter
                     </button>
@@ -1484,13 +1484,13 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                       {tags.map((t) => (
                         <span
                           key={t}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] bg-[#f5f5f7] text-[#1d1d1f] border border-black/[0.06]"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] bg-[#f5f5f7] dark:bg-[#252528] text-[#1d1d1f] dark:text-[#f5f5f7] border border-black/[0.06] dark:border-white/[0.08]"
                         >
                           <span>#{t}</span>
                           <button
                             type="button"
                             onClick={() => handleRemoveTag(t)}
-                            className="text-[#86868b] hover:text-rose-600 cursor-pointer"
+                            className="text-[#86868b] dark:text-[#8e8e93] hover:text-rose-600 dark:hover:text-rose-400 cursor-pointer"
                           >
                             <X className="w-3 h-3" />
                           </button>
@@ -1501,7 +1501,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-[#1d1d1f] block mb-1">
+                  <label className="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] block mb-1">
                     Notes libres, historique d'entretien & remarques
                   </label>
                   <textarea
@@ -1509,7 +1509,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Remarques particulières, état de la batterie, date de révision, historique..."
-                    className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] border border-black/[0.08] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 leading-relaxed"
+                    className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] dark:bg-[#252528] text-[#1d1d1f] dark:text-[#f5f5f7] border border-black/[0.08] dark:border-white/[0.1] focus:bg-white dark:focus:bg-[#2c2c2e] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 leading-relaxed"
                   />
                 </div>
               </div>

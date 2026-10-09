@@ -21,7 +21,7 @@ export const AppLayout: React.FC = () => {
   } = useInventory();
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7] dark:bg-[#000000] text-[#1d1d1f] dark:text-[#f5f5f7] flex flex-col font-sans selection:bg-[#0071e3] selection:text-white transition-colors duration-150">
+    <div className="w-full max-w-full overflow-x-hidden min-h-screen bg-[#f5f5f7] dark:bg-[#000000] text-[#1d1d1f] dark:text-[#f5f5f7] flex flex-col font-sans selection:bg-[#0071e3] selection:text-white transition-colors duration-150">
       {/* Barre de navigation supérieure (Navbar) */}
       <Navbar
         isMobileSidebarOpen={isMobileSidebarOpen}
@@ -29,14 +29,14 @@ export const AppLayout: React.FC = () => {
       />
 
       {/* Conteneur principal avec Sidebar latérale et zone de contenu */}
-      <div className="flex-1 max-w-7xl w-full mx-auto flex">
+      <div className="flex-1 max-w-7xl w-full mx-auto flex min-w-0">
         <Sidebar
           isOpen={isMobileSidebarOpen}
           onClose={() => setIsMobileSidebarOpen(false)}
         />
 
         {/* Zone de contenu principale (dynamique via les routes de HashRouter) */}
-        <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8">
+        <main className="flex-1 min-w-0 max-w-full p-4 sm:p-6 lg:p-8">
           <Outlet />
         </main>
       </div>

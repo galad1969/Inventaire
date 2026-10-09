@@ -367,7 +367,7 @@ export const InventoryPage: React.FC = () => {
       </div>
 
       {/* Barre de filtres rapides en un clic */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+      <div className="flex items-center gap-2 overflow-x-auto max-w-full pb-1 scrollbar-none">
         <button
           onClick={() => {
             setSelectedTag(null);
