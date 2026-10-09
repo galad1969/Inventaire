@@ -61,14 +61,14 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
       />
 
       <div className="min-h-full flex items-center justify-center p-4">
-        <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-black/[0.08] overflow-hidden p-6 space-y-4">
+        <div className="relative w-full max-w-md bg-white dark:bg-[#1c1c1e] rounded-3xl shadow-2xl border border-black/[0.08] dark:border-white/[0.08] overflow-hidden p-6 space-y-4">
           
           <div className="flex items-start gap-3.5">
             <div
               className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${
                 isDestructive
-                  ? 'bg-rose-50 text-rose-600 border border-rose-100'
-                  : 'bg-amber-50 text-amber-600 border border-amber-100'
+                  ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/40'
+                  : 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-900/40'
               }`}
             >
               {options.icon === 'archive' ? (
@@ -81,10 +81,10 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
             </div>
 
             <div className="flex-1 min-w-0">
-              <h3 className="text-base font-bold text-[#1d1d1f] tracking-tight">
+              <h3 className="text-base font-bold text-[#1d1d1f] dark:text-[#f5f5f7] tracking-tight">
                 {options.title}
               </h3>
-              <p className="text-xs text-[#86868b] mt-1.5 leading-relaxed">
+              <p className="text-xs text-[#86868b] dark:text-[#8e8e93] mt-1.5 leading-relaxed">
                 {options.message}
               </p>
             </div>
@@ -92,7 +92,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
             <button
               disabled={isProcessing}
               onClick={onClose}
-              className="p-1 rounded-full text-[#86868b] hover:text-[#1d1d1f] hover:bg-black/[0.05] transition cursor-pointer"
+              className="p-1 rounded-full text-[#86868b] dark:text-[#8e8e93] hover:text-[#1d1d1f] dark:hover:text-white hover:bg-black/[0.05] dark:hover:bg-white/[0.08] transition cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -104,7 +104,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
               type="button"
               disabled={isProcessing}
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-medium text-[#86868b] hover:text-[#1d1d1f] hover:bg-black/[0.04] transition cursor-pointer disabled:opacity-50"
+              className="px-4 py-2 rounded-xl text-xs font-medium text-[#86868b] dark:text-[#8e8e93] hover:text-[#1d1d1f] dark:hover:text-[#f5f5f7] hover:bg-black/[0.04] dark:hover:bg-white/[0.08] transition cursor-pointer disabled:opacity-50"
             >
               {options.cancelLabel || 'Annuler'}
             </button>

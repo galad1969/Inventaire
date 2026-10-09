@@ -21,6 +21,7 @@ import {
   Box,
   Package,
   Hash,
+  Camera,
 } from 'lucide-react';
 import {
   InventoryItem,
@@ -61,6 +62,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
 }) => {
   const { items, settings, allTags, refreshInventory, deleteItemById, requestConfirmation } = useInventory();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const primaryFileInputRef = useRef<HTMLInputElement>(null);
 
   // Onglet actif du formulaire
   const [activeTab, setActiveTab] = useState<'general' | 'location' | 'financial' | 'media' | 'relations' | 'notes'>('general');
@@ -261,6 +263,33 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
     });
   };
 
+  // Ajout direct et spécifique d'une photo définie d'emblée comme illustration par défaut
+  const handlePrimaryPhotoAdded = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const file = files[0];
+    if (!file.type.startsWith('image/')) {
+      setErrorMsg('Veuillez sélectionner un fichier image valide (JPEG, PNG, WebP) pour l\'illustration.');
+      return;
+    }
+
+    const id = 'media-' + Math.random().toString(36).substring(2, 9) + '-' + Date.now();
+    const newDraft: UploadedMediaDraft = {
+      id,
+      name: file.name,
+      size: file.size,
+      mimeType: file.type || 'image/jpeg',
+      category: 'photo',
+      file,
+      blob: file,
+      previewUrl: URL.createObjectURL(file),
+      isExisting: false,
+    };
+
+    setMediaDrafts((prev) => [newDraft, ...prev]);
+    setPrimaryPhotoId(id);
+    setErrorMsg(null);
+  };
+
   const handleRemoveMedia = (draftId: string) => {
     setMediaDrafts((prev) => prev.filter((m) => m.id !== draftId));
     if (primaryPhotoId === draftId) {
@@ -365,7 +394,15 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
         tags,
         relations: relations,
         mediaIds: finalMediaIds,
-        primaryPhotoId: primaryPhotoId && finalMediaIds.includes(primaryPhotoId) ? primaryPhotoId : finalMediaIds[0],
+        primaryPhotoId: (() => {
+          if (primaryPhotoId && finalMediaIds.includes(primaryPhotoId)) {
+            return primaryPhotoId;
+          }
+          const firstPhoto = mediaDrafts.find(
+            (m) => finalMediaIds.includes(m.id) && (m.category === 'photo' || m.mimeType.startsWith('image/'))
+          );
+          return firstPhoto?.id;
+        })(),
         createdAt: itemToEdit?.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         archivedAt: status === 'archive' ? (itemToEdit?.archivedAt || new Date().toISOString()) : undefined,
@@ -394,29 +431,29 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
       />
 
       <div className="min-h-full flex items-center justify-center p-3 sm:p-6">
-        <div className="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl border border-black/[0.08] overflow-hidden flex flex-col max-h-[92vh]">
+        <div className="relative w-full max-w-3xl bg-white dark:bg-[#1c1c1e] rounded-3xl shadow-2xl border border-black/[0.08] dark:border-white/[0.08] overflow-hidden flex flex-col max-h-[92vh]">
           
           {/* Header */}
-          <div className="px-6 py-4 border-b border-black/[0.06] flex items-center justify-between bg-[#fbfbfd]">
+          <div className="px-6 py-4 border-b border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between bg-[#fbfbfd] dark:bg-[#18181b]">
             <div>
-              <h2 className="text-base font-bold text-[#1d1d1f]">
+              <h2 className="text-base font-bold text-[#1d1d1f] dark:text-[#f5f5f7]">
                 {itemToEdit ? `Modifier « ${itemToEdit.name} »` : 'Ajouter un objet à l\'inventaire'}
               </h2>
-              <p className="text-xs text-[#86868b] mt-0.5">
+              <p className="text-xs text-[#86868b] dark:text-[#8e8e93] mt-0.5">
                 Renseignez les détails, l'arborescence de stockage et téléversez vos photos/factures
               </p>
             </div>
 
             <button
               onClick={onClose}
-              className="p-1.5 rounded-full text-[#86868b] hover:text-[#1d1d1f] hover:bg-black/[0.05] transition cursor-pointer"
+              className="p-1.5 rounded-full text-[#86868b] dark:text-[#8e8e93] hover:text-[#1d1d1f] dark:hover:text-white hover:bg-black/[0.05] dark:hover:bg-white/[0.08] transition cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Onglets style Apple Sheet */}
-          <div className="flex border-b border-black/[0.06] bg-[#f5f5f7] px-4 overflow-x-auto scrollbar-none">
+          <div className="flex border-b border-black/[0.06] dark:border-white/[0.08] bg-[#f5f5f7] dark:bg-[#141416] px-4 overflow-x-auto scrollbar-none">
             {[
               { id: 'general', label: '1. Informations', icon: Tag },
               { id: 'location', label: '2. Emplacement', icon: MapPin },
@@ -433,8 +470,8 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`flex items-center gap-1.5 px-3.5 py-3 text-xs font-medium border-b-2 whitespace-nowrap transition cursor-pointer ${
                     isActive
-                      ? 'border-[#0071e3] text-[#0071e3] bg-white'
-                      : 'border-transparent text-[#86868b] hover:text-[#1d1d1f]'
+                      ? 'border-[#0071e3] text-[#0071e3] dark:text-[#0a84ff] bg-white dark:bg-[#1c1c1e]'
+                      : 'border-transparent text-[#86868b] dark:text-[#8e8e93] hover:text-[#1d1d1f] dark:hover:text-[#f5f5f7]'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -458,7 +495,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
             {activeTab === 'general' && (
               <div className="space-y-4">
                 <div>
-                  <label className="text-xs font-semibold text-[#1d1d1f] block mb-1">
+                  <label className="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] block mb-1">
                     Nom de l'objet <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -467,19 +504,19 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Ex: MacBook Pro 16 M3, Boîtier Sony Alpha 7 IV, Perceuse sans fil..."
-                    className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] border border-black/[0.08] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 font-medium"
+                    className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] dark:bg-[#121214] text-[#1d1d1f] dark:text-[#f5f5f7] border border-black/[0.08] dark:border-white/[0.1] focus:bg-white dark:focus:bg-[#1c1c1e] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 font-medium"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs font-semibold text-[#1d1d1f] block mb-1">
+                    <label className="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] block mb-1">
                       Catégorie
                     </label>
                     <select
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
-                      className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] border border-black/[0.08] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 cursor-pointer"
+                      className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] dark:bg-[#121214] text-[#1d1d1f] dark:text-[#f5f5f7] border border-black/[0.08] dark:border-white/[0.1] focus:bg-white dark:focus:bg-[#1c1c1e] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 cursor-pointer"
                     >
                       {settings?.categories.map((cat) => (
                         <option key={cat} value={cat}>
@@ -495,19 +532,19 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                         placeholder="Nom de la nouvelle catégorie..."
                         value={customCategory}
                         onChange={(e) => setCustomCategory(e.target.value)}
-                        className="mt-2 w-full px-3 py-2 text-xs rounded-xl bg-white border border-[#0071e3]/40 focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
+                        className="mt-2 w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-[#121214] text-[#1d1d1f] dark:text-[#f5f5f7] border border-[#0071e3]/40 focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
                       />
                     )}
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-[#1d1d1f] block mb-1">
+                    <label className="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] block mb-1">
                       État matériel
                     </label>
                     <select
                       value={condition}
                       onChange={(e) => setCondition(e.target.value as ItemCondition)}
-                      className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] border border-black/[0.08] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 cursor-pointer"
+                      className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#f5f5f7] dark:bg-[#121214] text-[#1d1d1f] dark:text-[#f5f5f7] border border-black/[0.08] dark:border-white/[0.1] focus:bg-white dark:focus:bg-[#1c1c1e] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 cursor-pointer"
                     >
                       <option value="neuf">Neuf (jamais utilisé / sous blister)</option>
                       <option value="tres_bon_etat">Très bon état (impeccable)</option>
@@ -520,7 +557,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="text-xs font-semibold text-[#1d1d1f] block mb-1">
+                    <label className="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] block mb-1">
                       Marque
                     </label>
                     <input
@@ -528,12 +565,12 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                       value={brand}
                       onChange={(e) => setBrand(e.target.value)}
                       placeholder="Ex: Apple, Sony, Dyson..."
-                      className="w-full px-3.5 py-2 text-xs rounded-xl bg-[#f5f5f7] border border-black/[0.08] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
+                      className="w-full px-3.5 py-2 text-xs rounded-xl bg-[#f5f5f7] dark:bg-[#121214] text-[#1d1d1f] dark:text-[#f5f5f7] border border-black/[0.08] dark:border-white/[0.1] focus:bg-white dark:focus:bg-[#1c1c1e] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
                     />
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-[#1d1d1f] block mb-1">
+                    <label className="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] block mb-1">
                       Modèle
                     </label>
                     <input
@@ -541,12 +578,12 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                       value={model}
                       onChange={(e) => setModel(e.target.value)}
                       placeholder="Ex: A2992, ILCE-7M4..."
-                      className="w-full px-3.5 py-2 text-xs rounded-xl bg-[#f5f5f7] border border-black/[0.08] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
+                      className="w-full px-3.5 py-2 text-xs rounded-xl bg-[#f5f5f7] dark:bg-[#121214] text-[#1d1d1f] dark:text-[#f5f5f7] border border-black/[0.08] dark:border-white/[0.1] focus:bg-white dark:focus:bg-[#1c1c1e] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20"
                     />
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-[#1d1d1f] block mb-1">
+                    <label className="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] block mb-1">
                       Numéro de série (S/N)
                     </label>
                     <input
@@ -554,14 +591,14 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                       value={serialNumber}
                       onChange={(e) => setSerialNumber(e.target.value)}
                       placeholder="Ex: C02G9012MD6T..."
-                      className="w-full px-3.5 py-2 text-xs rounded-xl bg-[#f5f5f7] border border-black/[0.08] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 font-mono"
+                      className="w-full px-3.5 py-2 text-xs rounded-xl bg-[#f5f5f7] dark:bg-[#121214] text-[#1d1d1f] dark:text-[#f5f5f7] border border-black/[0.08] dark:border-white/[0.1] focus:bg-white dark:focus:bg-[#1c1c1e] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 font-mono"
                     />
                   </div>
                 </div>
 
                 {/* Statut & Vente */}
-                <div className="pt-3 border-t border-black/[0.05] space-y-3">
-                  <label className="text-xs font-semibold text-[#1d1d1f] block">
+                <div className="pt-3 border-t border-black/[0.05] dark:border-white/[0.06] space-y-3">
+                  <label className="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] block">
                     Statut de l'objet
                   </label>
                   <div className="grid grid-cols-3 gap-3">
@@ -577,7 +614,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                         className={`py-2 px-3 rounded-xl text-xs font-medium border transition cursor-pointer ${
                           status === st.id
                             ? 'bg-[#0071e3] text-white border-[#0071e3] shadow-xs'
-                            : 'bg-[#f5f5f7] text-[#1d1d1f] border-black/[0.06] hover:bg-[#ebebee]'
+                            : 'bg-[#f5f5f7] dark:bg-white/[0.06] text-[#1d1d1f] dark:text-[#f5f5f7] border-black/[0.06] dark:border-white/[0.08] hover:bg-[#ebebee] dark:hover:bg-white/[0.1]'
                         }`}
                       >
                         {st.label}
@@ -586,10 +623,10 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                   </div>
 
                   {status === 'en_vente' && (
-                    <div className="p-4 rounded-2xl bg-amber-500/[0.08] border border-amber-500/20 space-y-3">
+                    <div className="p-4 rounded-2xl bg-amber-500/[0.08] dark:bg-amber-950/20 border border-amber-500/20 dark:border-amber-800/40 space-y-3">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                          <label className="text-xs font-semibold text-amber-900 block mb-1">
+                          <label className="text-xs font-semibold text-amber-900 dark:text-amber-300 block mb-1">
                             Prix de vente souhaité (€)
                           </label>
                           <input
@@ -598,12 +635,12 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                             value={salePrice}
                             onChange={(e) => setSalePrice(e.target.value)}
                             placeholder="Ex: 250"
-                            className="w-full px-3 py-2 text-xs rounded-xl bg-white border border-amber-500/30 focus:outline-none focus:ring-2 focus:ring-amber-500/20 font-semibold"
+                            className="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-[#1c1c1e] text-[#1d1d1f] dark:text-[#f5f5f7] border border-amber-500/30 dark:border-amber-800/50 focus:outline-none focus:ring-2 focus:ring-amber-500/20 font-semibold"
                           />
                         </div>
 
                         <div>
-                          <label className="text-xs font-semibold text-amber-900 block mb-1">
+                          <label className="text-xs font-semibold text-amber-900 dark:text-amber-300 block mb-1">
                             Notes d'annonce (Leboncoin, Vinted...)
                           </label>
                           <input
@@ -611,7 +648,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                             value={saleNotes}
                             onChange={(e) => setSaleNotes(e.target.value)}
                             placeholder="Ex: En boîte d'origine, remise en main propre..."
-                            className="w-full px-3 py-2 text-xs rounded-xl bg-white border border-amber-500/30 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                            className="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-[#1c1c1e] text-[#1d1d1f] dark:text-[#f5f5f7] border border-amber-500/30 dark:border-amber-800/50 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
                           />
                         </div>
                       </div>
@@ -913,53 +950,174 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
 
             {/* ONGLET 4 : MÉDIAS, PHOTOS & FACTURES PDF */}
             {activeTab === 'media' && (
-              <div className="space-y-4">
-                {/* Zone de Drag and Drop */}
-                <div
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    setIsDragging(true);
-                  }}
-                  onDragLeave={() => setIsDragging(false)}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    setIsDragging(false);
-                    handleFilesAdded(e.dataTransfer.files);
-                  }}
-                  onClick={() => fileInputRef.current?.click()}
-                  className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${
-                    isDragging
-                      ? 'border-[#0071e3] bg-[#0071e3]/[0.05]'
-                      : 'border-black/[0.1] hover:border-[#0071e3]/50 bg-[#fbfbfd]'
-                  }`}
-                >
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    multiple
-                    accept="image/*,application/pdf"
-                    onChange={(e) => handleFilesAdded(e.target.files)}
-                    className="hidden"
-                  />
-                  <div className="w-10 h-10 rounded-2xl bg-[#0071e3]/10 text-[#0071e3] flex items-center justify-center mx-auto mb-2">
-                    <Upload className="w-5 h-5" />
-                  </div>
-                  <p className="text-xs font-semibold text-[#1d1d1f]">
-                    Glissez-déposez des photos ou factures PDF ici
-                  </p>
-                  <p className="text-[11px] text-[#86868b] mt-1">
-                    ou <span className="text-[#0071e3] font-medium underline">parcourez vos fichiers</span> (JPEG, PNG, WebP, SVG, PDF)
-                  </p>
-                </div>
+              <div className="space-y-5">
+                {/* 1. SECTION SPÉCIFIQUE : PHOTO D'ILLUSTRATION PAR DÉFAUT */}
+                {(() => {
+                  const primaryPhotoDraft = mediaDrafts.find(
+                    (m) => m.id === primaryPhotoId && (m.category === 'photo' || m.mimeType.startsWith('image/'))
+                  );
 
-                {/* Liste des médias ajoutés */}
-                {mediaDrafts.length > 0 && (
-                  <div className="space-y-2">
+                  return (
+                    <div className="p-4 rounded-3xl bg-gradient-to-b from-[#fbfbfd] to-[#f5f5f7] border border-black/[0.08] shadow-2xs space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-xl bg-[#0071e3]/10 text-[#0071e3] flex items-center justify-center shrink-0">
+                            <Camera className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <h4 className="text-xs font-semibold text-[#1d1d1f] flex items-center gap-1.5">
+                              <span>Photo d'illustration principale</span>
+                              <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-800">
+                                Vignette par défaut
+                              </span>
+                            </h4>
+                            <p className="text-[11px] text-[#86868b]">
+                              Image de référence affichée sur la fiche et dans toutes les listes de l'inventaire.
+                            </p>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => primaryFileInputRef.current?.click()}
+                          className="px-3.5 py-1.5 rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-medium shadow-xs transition flex items-center gap-1.5 cursor-pointer shrink-0 self-start sm:self-auto"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>{primaryPhotoDraft ? 'Remplacer illustration' : 'Ajouter photo par défaut'}</span>
+                        </button>
+                        <input
+                          ref={primaryFileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handlePrimaryPhotoAdded(e.target.files)}
+                          className="hidden"
+                        />
+                      </div>
+
+                      {/* Aperçu de la photo d'illustration active */}
+                      {primaryPhotoDraft ? (
+                        <div className="p-3.5 rounded-2xl bg-white border border-[#0071e3]/30 shadow-2xs flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-16 h-16 rounded-xl bg-[#f5f5f7] border border-black/[0.06] overflow-hidden shrink-0 flex items-center justify-center relative">
+                              {primaryPhotoDraft.previewUrl ? (
+                                <img
+                                  src={primaryPhotoDraft.previewUrl}
+                                  alt={primaryPhotoDraft.name}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <ImageIcon className="w-6 h-6 text-[#86868b]" />
+                              )}
+                              <div className="absolute top-1 left-1 w-4 h-4 rounded-full bg-amber-500 text-white flex items-center justify-center shadow-xs">
+                                <Star className="w-2.5 h-2.5 fill-current" />
+                              </div>
+                            </div>
+                            <div className="min-w-0">
+                              <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-800">
+                                <Star className="w-3 h-3 fill-amber-500 text-amber-600" />
+                                Illustration par défaut active
+                              </span>
+                              <span className="text-xs font-semibold text-[#1d1d1f] block truncate mt-1">
+                                {primaryPhotoDraft.name}
+                              </span>
+                              <span className="text-[10px] text-[#86868b]">
+                                {(primaryPhotoDraft.size / 1024).toFixed(0)} Ko • Image
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => primaryFileInputRef.current?.click()}
+                              className="px-3 py-1.5 rounded-xl bg-[#f5f5f7] hover:bg-[#ebebee] text-[#1d1d1f] text-xs font-medium transition cursor-pointer"
+                            >
+                              Changer
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setPrimaryPhotoId(undefined)}
+                              className="p-1.5 rounded-xl text-[#86868b] hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
+                              title="Désélectionner comme illustration"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div
+                          onClick={() => primaryFileInputRef.current?.click()}
+                          className="p-4 rounded-2xl border border-dashed border-black/[0.12] hover:border-[#0071e3]/50 bg-white/70 hover:bg-white text-center cursor-pointer transition flex flex-col items-center justify-center gap-1.5 group"
+                        >
+                          <Camera className="w-6 h-6 text-[#86868b] group-hover:text-[#0071e3] transition-colors" />
+                          <span className="text-xs font-semibold text-[#1d1d1f]">
+                            Aucune photo d'illustration définie
+                          </span>
+                          <span className="text-[11px] text-[#86868b]">
+                            Cliquez ici pour sélectionner une photo dédiée qui servira d'illustration par défaut
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+
+                {/* 2. SECTION PHOTOS SECONDAIRES & FACTURES */}
+                <div className="space-y-3 pt-1">
+                  <div className="flex items-center justify-between">
                     <span className="text-xs font-semibold text-[#1d1d1f] block">
-                      Fichiers joints à cet objet ({mediaDrafts.length}) :
+                      Toutes les photos & documents ({mediaDrafts.length})
                     </span>
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="text-xs text-[#0071e3] hover:underline font-medium cursor-pointer"
+                    >
+                      + Ajouter des fichiers
+                    </button>
+                  </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Zone de Drag and Drop générale */}
+                  <div
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      setIsDragging(true);
+                    }}
+                    onDragLeave={() => setIsDragging(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setIsDragging(false);
+                      handleFilesAdded(e.dataTransfer.files);
+                    }}
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`border-2 border-dashed rounded-2xl p-5 text-center cursor-pointer transition-all ${
+                      isDragging
+                        ? 'border-[#0071e3] bg-[#0071e3]/[0.05]'
+                        : 'border-black/[0.1] hover:border-[#0071e3]/50 bg-[#fbfbfd]'
+                    }`}
+                  >
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      multiple
+                      accept="image/*,application/pdf"
+                      onChange={(e) => handleFilesAdded(e.target.files)}
+                      className="hidden"
+                    />
+                    <div className="w-9 h-9 rounded-2xl bg-[#0071e3]/10 text-[#0071e3] flex items-center justify-center mx-auto mb-1.5">
+                      <Upload className="w-4 h-4" />
+                    </div>
+                    <p className="text-xs font-semibold text-[#1d1d1f]">
+                      Glissez d'autres photos ou factures PDF ici
+                    </p>
+                    <p className="text-[11px] text-[#86868b] mt-0.5">
+                      ou <span className="text-[#0071e3] font-medium underline">parcourez vos fichiers</span> (JPEG, PNG, WebP, PDF)
+                    </p>
+                  </div>
+
+                  {/* Liste des médias ajoutés avec bouton "Définir par défaut" */}
+                  {mediaDrafts.length > 0 && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
                       {mediaDrafts.map((draft) => {
                         const isPrimary = primaryPhotoId === draft.id;
                         const isPdf = draft.mimeType === 'application/pdf';
@@ -969,13 +1127,13 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                             key={draft.id}
                             className={`p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
                               isPrimary
-                                ? 'bg-[#0071e3]/[0.05] border-[#0071e3]/40 ring-1 ring-[#0071e3]/20'
-                                : 'bg-[#fbfbfd] border-black/[0.06]'
+                                ? 'bg-[#0071e3]/[0.05] border-[#0071e3]/40 ring-1 ring-[#0071e3]/20 shadow-2xs'
+                                : 'bg-[#fbfbfd] border-black/[0.06] hover:bg-white'
                             }`}
                           >
                             <div className="flex items-center gap-3 truncate">
                               {/* Miniature ou icône PDF */}
-                              <div className="w-12 h-12 rounded-xl bg-white border border-black/[0.06] overflow-hidden flex items-center justify-center shrink-0">
+                              <div className="w-12 h-12 rounded-xl bg-white border border-black/[0.06] overflow-hidden flex items-center justify-center shrink-0 relative">
                                 {draft.previewUrl ? (
                                   <img
                                     src={draft.previewUrl}
@@ -986,6 +1144,11 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                                   <FileText className="w-6 h-6 text-rose-500" />
                                 ) : (
                                   <ImageIcon className="w-6 h-6 text-[#86868b]" />
+                                )}
+                                {isPrimary && (
+                                  <div className="absolute top-0.5 left-0.5 w-3.5 h-3.5 rounded-full bg-amber-500 text-white flex items-center justify-center">
+                                    <Star className="w-2 h-2 fill-current" />
+                                  </div>
                                 )}
                               </div>
 
@@ -1001,20 +1164,24 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                             </div>
 
                             {/* Actions sur le média */}
-                            <div className="flex items-center gap-1 shrink-0">
+                            <div className="flex items-center gap-1.5 shrink-0">
                               {!isPdf && (
-                                <button
-                                  type="button"
-                                  onClick={() => setPrimaryPhotoId(draft.id)}
-                                  className={`p-1.5 rounded-lg transition cursor-pointer ${
-                                    isPrimary
-                                      ? 'bg-[#0071e3] text-white shadow-xs'
-                                      : 'text-[#86868b] hover:text-amber-500 hover:bg-black/[0.04]'
-                                  }`}
-                                  title={isPrimary ? 'Photo principale' : 'Définir comme photo principale'}
-                                >
-                                  <Star className={`w-3.5 h-3.5 ${isPrimary ? 'fill-current' : ''}`} />
-                                </button>
+                                isPrimary ? (
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#0071e3] text-white text-[11px] font-semibold shadow-xs">
+                                    <Star className="w-3 h-3 fill-current" />
+                                    <span>Par défaut</span>
+                                  </span>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onClick={() => setPrimaryPhotoId(draft.id)}
+                                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#f5f5f7] hover:bg-[#0071e3]/10 text-[#555558] hover:text-[#0071e3] text-[11px] font-medium transition cursor-pointer"
+                                    title="Définir comme illustration par défaut de cet objet"
+                                  >
+                                    <Star className="w-3 h-3 text-amber-500" />
+                                    <span>Par défaut</span>
+                                  </button>
+                                )
                               )}
 
                               <button
@@ -1030,8 +1197,8 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                         );
                       })}
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             )}
 
@@ -1351,12 +1518,12 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
           </form>
 
           {/* Footer Actions */}
-          <div className="px-6 py-4 border-t border-black/[0.06] bg-[#fbfbfd] flex items-center justify-between gap-3">
+          <div className="px-6 py-4 border-t border-black/[0.06] dark:border-white/[0.08] bg-[#fbfbfd] dark:bg-[#18181b] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded-xl text-xs font-medium text-[#86868b] hover:text-[#1d1d1f] hover:bg-black/[0.04] transition cursor-pointer"
+                className="px-4 py-2 rounded-xl text-xs font-medium text-[#86868b] dark:text-[#8e8e93] hover:text-[#1d1d1f] dark:hover:text-[#f5f5f7] hover:bg-black/[0.04] dark:hover:bg-white/[0.08] transition cursor-pointer"
               >
                 Annuler
               </button>
@@ -1378,7 +1545,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                       },
                     });
                   }}
-                  className="px-3 py-2 rounded-xl text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200/60 transition flex items-center gap-1 cursor-pointer"
+                  className="px-3 py-2 rounded-xl text-xs font-semibold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 border border-rose-200/60 dark:border-rose-900/40 transition flex items-center gap-1 cursor-pointer"
                   title="Supprimer définitivement cet objet"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -1403,7 +1570,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     const idx = tabs.indexOf(activeTab);
                     if (idx > 0) setActiveTab(tabs[idx - 1]);
                   }}
-                  className="px-3 py-2 rounded-xl text-xs font-medium bg-[#f5f5f7] text-[#555558] hover:bg-[#ebebee] transition cursor-pointer"
+                  className="px-3 py-2 rounded-xl text-xs font-medium bg-[#f5f5f7] dark:bg-white/[0.08] text-[#555558] dark:text-[#f5f5f7] hover:bg-[#ebebee] dark:hover:bg-white/[0.12] transition cursor-pointer"
                 >
                   Précédent
                 </button>
@@ -1424,7 +1591,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     const idx = tabs.indexOf(activeTab);
                     if (idx < tabs.length - 1) setActiveTab(tabs[idx + 1]);
                   }}
-                  className="px-4 py-2 rounded-xl text-xs font-medium bg-black/[0.06] hover:bg-black/[0.09] text-[#1d1d1f] transition cursor-pointer flex items-center gap-1"
+                  className="px-4 py-2 rounded-xl text-xs font-medium bg-black/[0.06] dark:bg-white/[0.08] hover:bg-black/[0.09] dark:hover:bg-white/[0.12] text-[#1d1d1f] dark:text-[#f5f5f7] transition cursor-pointer flex items-center gap-1"
                 >
                   <span>Suivant</span>
                   <ChevronRight className="w-3.5 h-3.5" />

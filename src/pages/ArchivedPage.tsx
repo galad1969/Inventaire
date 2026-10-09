@@ -36,20 +36,20 @@ export const ArchivedPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-[#1d1d1f] flex items-center gap-2">
-          <Archive className="w-6 h-6 text-[#86868b]" />
+        <h1 className="text-2xl font-bold tracking-tight text-[#1d1d1f] dark:text-[#f5f5f7] flex items-center gap-2">
+          <Archive className="w-6 h-6 text-[#86868b] dark:text-[#a1a1a6]" />
           <span>Objets Archivés</span>
         </h1>
-        <p className="text-xs text-[#86868b] mt-0.5">
+        <p className="text-xs text-[#86868b] dark:text-[#8e8e93] mt-0.5">
           Objets archivés avant suppression définitive ({archivedItems.length})
         </p>
       </div>
 
       {archivedItems.length === 0 ? (
-        <div className="py-16 text-center rounded-3xl bg-white border border-black/[0.06] shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-6">
-          <Archive className="w-10 h-10 text-[#86868b] mx-auto mb-3 opacity-40" />
-          <h2 className="text-base font-semibold text-[#1d1d1f]">Aucun objet dans les archives</h2>
-          <p className="text-xs text-[#86868b] mt-1 max-w-sm mx-auto">
+        <div className="py-16 text-center rounded-3xl bg-white dark:bg-[#1c1c1e] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-6">
+          <Archive className="w-10 h-10 text-[#86868b] dark:text-[#636366] mx-auto mb-3 opacity-40" />
+          <h2 className="text-base font-semibold text-[#1d1d1f] dark:text-[#f5f5f7]">Aucun objet dans les archives</h2>
+          <p className="text-xs text-[#86868b] dark:text-[#8e8e93] mt-1 max-w-sm mx-auto">
             L'archivage permet de masquer un objet de l'inventaire actif tout en conservant ses données et factures.
           </p>
         </div>
@@ -58,31 +58,31 @@ export const ArchivedPage: React.FC = () => {
           {archivedItems.map((item) => (
             <div
               key={item.id}
-              className="rounded-2xl bg-white border border-black/[0.06] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)] space-y-4"
+              className="rounded-2xl bg-white dark:bg-[#1c1c1e] border border-black/[0.06] dark:border-white/[0.08] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)] space-y-4"
             >
               <div>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-black/[0.04] text-[#86868b]">
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-black/[0.04] dark:bg-white/[0.08] text-[#86868b] dark:text-[#a1a1a6]">
                   Archivé le {item.archivedAt ? new Date(item.archivedAt).toLocaleDateString('fr-FR') : 'Récemment'}
                 </span>
-                <h3 className="font-semibold text-sm text-[#1d1d1f] mt-1.5">{item.name}</h3>
-                <p className="text-xs text-[#86868b]">
+                <h3 className="font-semibold text-sm text-[#1d1d1f] dark:text-[#f5f5f7] mt-1.5">{item.name}</h3>
+                <p className="text-xs text-[#86868b] dark:text-[#8e8e93]">
                   {item.brand ? `${item.brand} ` : ''}
                   {item.model ? `• ${item.model}` : ''}
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-black/[0.04] flex items-center justify-between gap-2">
+              <div className="pt-3 border-t border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between gap-2">
                 <button
                   onClick={() => handleRestore(item.id)}
-                  className="px-3 py-1.5 rounded-xl bg-[#f5f5f7] hover:bg-[#ebebee] text-[#1d1d1f] text-xs font-medium border border-black/[0.06] transition flex items-center gap-1.5 cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl bg-[#f5f5f7] dark:bg-white/[0.08] hover:bg-[#ebebee] dark:hover:bg-white/[0.12] text-[#1d1d1f] dark:text-[#f5f5f7] text-xs font-medium border border-black/[0.06] dark:border-white/[0.08] transition flex items-center gap-1.5 cursor-pointer"
                 >
-                  <RotateCcw className="w-3.5 h-3.5 text-[#0071e3]" />
+                  <RotateCcw className="w-3.5 h-3.5 text-[#0071e3] dark:text-[#0a84ff]" />
                   <span>Désarchiver</span>
                 </button>
 
                 <button
                   onClick={() => handlePermanentDelete(item)}
-                  className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-medium border border-rose-200/50 transition flex items-center gap-1.5 cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/30 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 text-xs font-medium border border-rose-200/50 dark:border-rose-800/40 transition flex items-center gap-1.5 cursor-pointer"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   <span>Supprimer</span>

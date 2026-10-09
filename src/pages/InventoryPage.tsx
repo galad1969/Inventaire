@@ -11,9 +11,11 @@ import {
   RotateCcw,
   Plus,
   Hash,
+  FileSpreadsheet,
 } from 'lucide-react';
 import { useInventory } from '../context/InventoryContext';
 import { getMediaById } from '../services/db';
+import { downloadInventoryCsv } from '../services/csvExport';
 import {
   InventoryItem,
   ViewMode,
@@ -93,10 +95,11 @@ export const InventoryPage: React.FC = () => {
     async function loadThumbnails() {
       const urls: Record<string, string> = {};
       for (const it of items) {
-        if (it.primaryPhotoId && !urls[it.primaryPhotoId]) {
-          const media = await getMediaById(it.primaryPhotoId);
+        const targetPhotoId = it.primaryPhotoId || (it.mediaIds && it.mediaIds[0]);
+        if (targetPhotoId && !urls[targetPhotoId]) {
+          const media = await getMediaById(targetPhotoId);
           if (media && media.blob && isMounted) {
-            urls[it.primaryPhotoId] = URL.createObjectURL(media.blob);
+            urls[targetPhotoId] = URL.createObjectURL(media.blob);
           }
         }
       }
@@ -272,6 +275,14 @@ export const InventoryPage: React.FC = () => {
     return processedItems.reduce((acc, it) => acc + (it.purchasePrice || 0), 0);
   }, [processedItems]);
 
+  const handleQuickExportCsv = () => {
+    downloadInventoryCsv(processedItems, {
+      delimiter: ';',
+      includeArchived: false,
+      filename: `inventaire-${new Date().toISOString().slice(0, 10)}.csv`,
+    });
+  };
+
   return (
     <div className="space-y-6">
       
@@ -279,10 +290,10 @@ export const InventoryPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-[#1d1d1f]">
+            <h1 className="text-2xl font-bold tracking-tight text-[#1d1d1f] dark:text-[#f5f5f7]">
               Tous les objets
             </h1>
-            <p className="text-xs text-[#86868b] mt-0.5">
+            <p className="text-xs text-[#86868b] dark:text-[#8e8e93] mt-0.5">
               {processedItems.length} objet{processedItems.length > 1 ? 's' : ''} affiché{processedItems.length > 1 ? 's' : ''}
               {totalFilteredValue > 0 && ` • Valeur totale : ${totalFilteredValue.toLocaleString('fr-FR')} €`}
             </p>
@@ -305,7 +316,7 @@ export const InventoryPage: React.FC = () => {
             <select
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value as SortOption)}
-              className="appearance-none pl-8 pr-8 py-2 text-xs font-medium rounded-xl bg-white border border-black/[0.08] text-[#1d1d1f] hover:bg-[#f5f5f7] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 shadow-2xs transition cursor-pointer"
+              className="appearance-none pl-8 pr-8 py-2 text-xs font-medium rounded-xl bg-white dark:bg-[#1c1c1e] border border-black/[0.08] dark:border-white/[0.1] text-[#1d1d1f] dark:text-[#f5f5f7] hover:bg-[#f5f5f7] dark:hover:bg-[#252528] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 shadow-2xs transition cursor-pointer"
             >
               <option value="updated-desc">Récemment modifiés</option>
               <option value="name-asc">Nom (A → Z)</option>
@@ -315,7 +326,7 @@ export const InventoryPage: React.FC = () => {
               <option value="date-desc">Date d'achat (Récents)</option>
               <option value="date-asc">Date d'achat (Anciens)</option>
             </select>
-            <ArrowUpDown className="w-3.5 h-3.5 text-[#86868b] absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ArrowUpDown className="w-3.5 h-3.5 text-[#86868b] dark:text-[#8e8e93] absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
 
           {/* Bouton Filtres avec badge interactif */}
@@ -323,8 +334,8 @@ export const InventoryPage: React.FC = () => {
             onClick={() => setIsFilterDrawerOpen(true)}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium border transition cursor-pointer shadow-2xs ${
               activeFiltersCount > 0
-                ? 'bg-[#0071e3]/10 text-[#0071e3] border-[#0071e3]/30'
-                : 'bg-white text-[#1d1d1f] border-black/[0.08] hover:bg-[#f5f5f7]'
+                ? 'bg-[#0071e3]/10 dark:bg-[#0071e3]/20 text-[#0071e3] dark:text-[#0a84ff] border-[#0071e3]/30 dark:border-[#0071e3]/40'
+                : 'bg-white dark:bg-[#1c1c1e] text-[#1d1d1f] dark:text-[#f5f5f7] border-black/[0.08] dark:border-white/[0.1] hover:bg-[#f5f5f7] dark:hover:bg-[#252528]'
             }`}
           >
             <Filter className="w-3.5 h-3.5" />
@@ -334,6 +345,17 @@ export const InventoryPage: React.FC = () => {
                 {activeFiltersCount}
               </span>
             )}
+          </button>
+
+          {/* Bouton Export CSV (Excel & Google Sheets) */}
+          <button
+            onClick={handleQuickExportCsv}
+            disabled={processedItems.length === 0}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/50 shadow-2xs transition cursor-pointer disabled:opacity-40"
+            title={`Exporter ces ${processedItems.length} objet(s) au format CSV pour Excel ou Google Sheets`}
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <span className="hidden sm:inline">Export CSV</span>
           </button>
 
           {/* Sélecteur de mode de vue (Grande Grille / Petite Grille / Liste) */}
@@ -363,8 +385,8 @@ export const InventoryPage: React.FC = () => {
             !filters.hasPackaging &&
             !filters.hasAccessories &&
             !selectedTag
-              ? 'bg-[#1d1d1f] text-white'
-              : 'bg-white text-[#555558] hover:bg-[#f5f5f7] border border-black/[0.06]'
+              ? 'bg-[#1d1d1f] dark:bg-[#f5f5f7] text-white dark:text-[#1d1d1f]'
+              : 'bg-white dark:bg-[#1c1c1e] text-[#555558] dark:text-[#a1a1a6] hover:bg-[#f5f5f7] dark:hover:bg-[#252528] dark:hover:text-[#f5f5f7] border border-black/[0.06] dark:border-white/[0.08]'
           }`}
         >
           Tous les objets
@@ -380,7 +402,7 @@ export const InventoryPage: React.FC = () => {
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium shrink-0 transition cursor-pointer ${
             filters.status === 'en_vente'
               ? 'bg-amber-500 text-white font-semibold shadow-xs'
-              : 'bg-white text-[#555558] hover:bg-[#f5f5f7] border border-black/[0.06]'
+              : 'bg-white dark:bg-[#1c1c1e] text-[#555558] dark:text-[#a1a1a6] hover:bg-[#f5f5f7] dark:hover:bg-[#252528] dark:hover:text-[#f5f5f7] border border-black/[0.06] dark:border-white/[0.08]'
           }`}
         >
           <span>🏷️ En vente</span>
@@ -396,7 +418,7 @@ export const InventoryPage: React.FC = () => {
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium shrink-0 transition cursor-pointer ${
             filters.warranty === 'active'
               ? 'bg-emerald-600 text-white font-semibold shadow-xs'
-              : 'bg-white text-[#555558] hover:bg-[#f5f5f7] border border-black/[0.06]'
+              : 'bg-white dark:bg-[#1c1c1e] text-[#555558] dark:text-[#a1a1a6] hover:bg-[#f5f5f7] dark:hover:bg-[#252528] dark:hover:text-[#f5f5f7] border border-black/[0.06] dark:border-white/[0.08]'
           }`}
         >
           <span>🛡️ Sous garantie</span>
@@ -412,7 +434,7 @@ export const InventoryPage: React.FC = () => {
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium shrink-0 transition cursor-pointer ${
             filters.hasPackaging
               ? 'bg-indigo-600 text-white font-semibold shadow-xs'
-              : 'bg-white text-[#555558] hover:bg-[#f5f5f7] border border-black/[0.06]'
+              : 'bg-white dark:bg-[#1c1c1e] text-[#555558] dark:text-[#a1a1a6] hover:bg-[#f5f5f7] dark:hover:bg-[#252528] dark:hover:text-[#f5f5f7] border border-black/[0.06] dark:border-white/[0.08]'
           }`}
         >
           <span>📦 Avec emballages</span>
@@ -428,7 +450,7 @@ export const InventoryPage: React.FC = () => {
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium shrink-0 transition cursor-pointer ${
             filters.hasAccessories
               ? 'bg-[#0071e3] text-white font-semibold shadow-xs'
-              : 'bg-white text-[#555558] hover:bg-[#f5f5f7] border border-black/[0.06]'
+              : 'bg-white dark:bg-[#1c1c1e] text-[#555558] dark:text-[#a1a1a6] hover:bg-[#f5f5f7] dark:hover:bg-[#252528] dark:hover:text-[#f5f5f7] border border-black/[0.06] dark:border-white/[0.08]'
           }`}
         >
           <span>🔌 Avec accessoires</span>
@@ -438,8 +460,8 @@ export const InventoryPage: React.FC = () => {
       {/* Ruban d'étiquettes transversales (Tags) */}
       {allTags.length > 0 && (
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-          <span className="text-[11px] font-semibold text-[#86868b] uppercase tracking-wider shrink-0 mr-1 flex items-center gap-1">
-            <Hash className="w-3 h-3 text-[#0071e3]" />
+          <span className="text-[11px] font-semibold text-[#86868b] dark:text-[#8e8e93] uppercase tracking-wider shrink-0 mr-1 flex items-center gap-1">
+            <Hash className="w-3 h-3 text-[#0071e3] dark:text-[#0a84ff]" />
             <span>Étiquettes :</span>
           </span>
 
@@ -447,8 +469,8 @@ export const InventoryPage: React.FC = () => {
             onClick={() => setSelectedTag(null)}
             className={`px-2.5 py-1 rounded-full text-xs font-medium shrink-0 transition cursor-pointer ${
               !selectedTag
-                ? 'bg-[#1d1d1f] text-white shadow-2xs'
-                : 'bg-white hover:bg-[#f5f5f7] text-[#555558] border border-black/[0.06]'
+                ? 'bg-[#1d1d1f] dark:bg-[#f5f5f7] text-white dark:text-[#1d1d1f] shadow-2xs'
+                : 'bg-white dark:bg-[#1c1c1e] hover:bg-[#f5f5f7] dark:hover:bg-[#252528] text-[#555558] dark:text-[#a1a1a6] border border-black/[0.06] dark:border-white/[0.08]'
             }`}
           >
             Toutes
@@ -463,13 +485,13 @@ export const InventoryPage: React.FC = () => {
                 className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium shrink-0 transition cursor-pointer ${
                   isSelected
                     ? 'bg-[#0071e3] text-white shadow-xs font-semibold'
-                    : 'bg-white hover:bg-[#f5f5f7] text-[#1d1d1f] border border-black/[0.06]'
+                    : 'bg-white dark:bg-[#1c1c1e] hover:bg-[#f5f5f7] dark:hover:bg-[#252528] text-[#1d1d1f] dark:text-[#f5f5f7] border border-black/[0.06] dark:border-white/[0.08]'
                 }`}
               >
                 <span>#{name}</span>
                 <span
                   className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                    isSelected ? 'bg-white/20 text-white' : 'bg-black/[0.05] text-[#86868b]'
+                    isSelected ? 'bg-white/20 text-white' : 'bg-black/[0.05] dark:bg-white/[0.1] text-[#86868b] dark:text-[#8e8e93]'
                   }`}
                 >
                   {count}
@@ -497,11 +519,11 @@ export const InventoryPage: React.FC = () => {
             </span>
           )}
           {searchQuery && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-white border border-black/[0.08] text-[#1d1d1f] shadow-2xs">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-white dark:bg-[#1c1c1e] border border-black/[0.08] dark:border-white/[0.1] text-[#1d1d1f] dark:text-[#f5f5f7] shadow-2xs">
               <span>Recherche : « {searchQuery} »</span>
               <button
                 onClick={() => setSearchQuery('')}
-                className="hover:text-rose-600 cursor-pointer"
+                className="hover:text-rose-600 dark:hover:text-rose-400 cursor-pointer"
               >
                 <X className="w-3 h-3" />
               </button>
@@ -509,7 +531,7 @@ export const InventoryPage: React.FC = () => {
           )}
 
           {filters.category && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-[#0071e3]/10 text-[#0071e3] border border-[#0071e3]/20">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-[#0071e3]/10 dark:bg-[#0071e3]/20 text-[#0071e3] dark:text-[#0a84ff] border border-[#0071e3]/20 dark:border-[#0071e3]/30">
               <span>Catégorie : {filters.category}</span>
               <button
                 onClick={() => {
@@ -524,7 +546,7 @@ export const InventoryPage: React.FC = () => {
           )}
 
           {filters.residence && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-black/[0.05] text-[#1d1d1f] border border-black/[0.06]">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-black/[0.05] dark:bg-white/[0.08] text-[#1d1d1f] dark:text-[#f5f5f7] border border-black/[0.06] dark:border-white/[0.1]">
               <span>📍 {filters.residence}</span>
               <button
                 onClick={() => {
@@ -539,7 +561,7 @@ export const InventoryPage: React.FC = () => {
           )}
 
           {filters.status !== 'all' && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-amber-50 text-amber-800 border border-amber-200">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/40">
               <span>Statut : {filters.status === 'en_vente' ? 'En vente' : filters.status}</span>
               <button
                 onClick={() => setFilters({ ...filters, status: 'all' })}
@@ -551,7 +573,7 @@ export const InventoryPage: React.FC = () => {
           )}
 
           {filters.condition !== 'all' && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-slate-100 text-[#1d1d1f] border border-black/[0.06]">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-slate-100 dark:bg-[#2c2c2e] text-[#1d1d1f] dark:text-[#f5f5f7] border border-black/[0.06] dark:border-white/[0.1]">
               <span>État : {filters.condition.replace(/_/g, ' ')}</span>
               <button
                 onClick={() => setFilters({ ...filters, condition: 'all' })}
@@ -563,7 +585,7 @@ export const InventoryPage: React.FC = () => {
           )}
 
           {filters.warranty !== 'all' && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-emerald-50 text-emerald-800 border border-emerald-200">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40">
               <span>Garantie : {filters.warranty === 'active' ? 'Active' : 'Expirée'}</span>
               <button
                 onClick={() => setFilters({ ...filters, warranty: 'all' })}
@@ -575,7 +597,7 @@ export const InventoryPage: React.FC = () => {
           )}
 
           {(filters.minPrice !== undefined || filters.maxPrice !== undefined) && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-slate-100 text-[#1d1d1f] border border-black/[0.06]">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-slate-100 dark:bg-[#2c2c2e] text-[#1d1d1f] dark:text-[#f5f5f7] border border-black/[0.06] dark:border-white/[0.1]">
               <span>
                 Prix : {filters.minPrice ?? 0} € - {filters.maxPrice ?? '∞'} €
               </span>
@@ -589,7 +611,7 @@ export const InventoryPage: React.FC = () => {
           )}
 
           {filters.hasPackaging && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-indigo-50 text-indigo-800 border border-indigo-200">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-indigo-50 dark:bg-indigo-950/40 text-indigo-800 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/40">
               <span>📦 Emballage inclus</span>
               <button
                 onClick={() => setFilters({ ...filters, hasPackaging: false })}
@@ -601,7 +623,7 @@ export const InventoryPage: React.FC = () => {
           )}
 
           {filters.hasAccessories && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-indigo-50 text-indigo-800 border border-indigo-200">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-indigo-50 dark:bg-indigo-950/40 text-indigo-800 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/40">
               <span>🔌 Accessoires inclus</span>
               <button
                 onClick={() => setFilters({ ...filters, hasAccessories: false })}
@@ -613,7 +635,7 @@ export const InventoryPage: React.FC = () => {
           )}
 
           {filters.hasInvoice && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-blue-50 text-blue-800 border border-blue-200">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800/40">
               <span>📄 Facture rattachée</span>
               <button
                 onClick={() => setFilters({ ...filters, hasInvoice: false })}
@@ -626,7 +648,7 @@ export const InventoryPage: React.FC = () => {
 
           <button
             onClick={handleResetAllFilters}
-            className="text-xs text-[#86868b] hover:text-[#1d1d1f] px-2 py-1 rounded hover:bg-black/[0.04] transition cursor-pointer flex items-center gap-1"
+            className="text-xs text-[#86868b] dark:text-[#8e8e93] hover:text-[#1d1d1f] dark:hover:text-[#f5f5f7] px-2 py-1 rounded hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition cursor-pointer flex items-center gap-1"
           >
             <RotateCcw className="w-3 h-3" />
             <span>Tout effacer</span>
@@ -636,12 +658,12 @@ export const InventoryPage: React.FC = () => {
 
       {/* Rendu des Vues : Grande Grille / Petite Grille / Liste */}
       {processedItems.length === 0 ? (
-        <div className="py-16 text-center rounded-3xl bg-white border border-black/[0.06] shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-6">
-          <Package className="w-10 h-10 text-[#86868b] mx-auto mb-3 opacity-40" />
-          <h2 className="text-base font-semibold text-[#1d1d1f]">
+        <div className="py-16 text-center rounded-3xl bg-white dark:bg-[#1c1c1e] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-6">
+          <Package className="w-10 h-10 text-[#86868b] dark:text-[#8e8e93] mx-auto mb-3 opacity-40" />
+          <h2 className="text-base font-semibold text-[#1d1d1f] dark:text-[#f5f5f7]">
             {items.length === 0 ? 'Aucun objet dans votre inventaire' : 'Aucun objet ne correspond à vos filtres'}
           </h2>
-          <p className="text-xs text-[#86868b] mt-1 max-w-sm mx-auto leading-relaxed">
+          <p className="text-xs text-[#86868b] dark:text-[#8e8e93] mt-1 max-w-sm mx-auto leading-relaxed">
             {items.length === 0
               ? 'Commencez par charger le jeu de données d\'exemple pour explorer votre inventaire personnel.'
               : 'Modifiez votre recherche ou réinitialisez les filtres pour afficher l\'ensemble des objets.'}
@@ -659,7 +681,7 @@ export const InventoryPage: React.FC = () => {
           ) : (
             <button
               onClick={handleResetAllFilters}
-              className="mt-4 px-4 py-2 rounded-xl bg-[#f5f5f7] hover:bg-[#ebebee] text-[#1d1d1f] text-xs font-medium border border-black/[0.06] transition inline-flex items-center gap-1.5 cursor-pointer"
+              className="mt-4 px-4 py-2 rounded-xl bg-[#f5f5f7] dark:bg-[#2c2c2e] hover:bg-[#ebebee] dark:hover:bg-[#353538] text-[#1d1d1f] dark:text-[#f5f5f7] text-xs font-medium border border-black/[0.06] dark:border-white/[0.08] transition inline-flex items-center gap-1.5 cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>Réinitialiser les filtres</span>

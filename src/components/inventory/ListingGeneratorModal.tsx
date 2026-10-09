@@ -132,23 +132,23 @@ export const ListingGeneratorModal: React.FC<ListingGeneratorModalProps> = ({
       />
 
       <div className="min-h-full flex items-center justify-center p-4 sm:p-6">
-        <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-black/[0.08] overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="relative w-full max-w-2xl bg-white dark:bg-[#1c1c1e] rounded-3xl shadow-2xl border border-black/[0.08] dark:border-white/[0.08] overflow-hidden flex flex-col max-h-[90vh]">
           
           {/* Header */}
-          <div className="px-6 py-4 border-b border-black/[0.06] flex items-center justify-between bg-[#fbfbfd]">
+          <div className="px-6 py-4 border-b border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between bg-[#fbfbfd] dark:bg-[#18181b]">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
                 <Tag className="w-4 h-4" />
               </div>
               <div>
-                <h2 className="font-semibold text-sm text-[#1d1d1f]">Générateur d'Annonce de Vente</h2>
-                <p className="text-[11px] text-[#86868b]">Prêt à copier pour Le Bon Coin, Vinted, eBay ou Facebook</p>
+                <h2 className="font-semibold text-sm text-[#1d1d1f] dark:text-[#f5f5f7]">Générateur d'Annonce de Vente</h2>
+                <p className="text-[11px] text-[#86868b] dark:text-[#8e8e93]">Prêt à copier pour Le Bon Coin, Vinted, eBay ou Facebook</p>
               </div>
             </div>
 
             <button
               onClick={onClose}
-              className="p-1.5 rounded-full text-[#86868b] hover:text-[#1d1d1f] hover:bg-black/[0.05] transition cursor-pointer"
+              className="p-1.5 rounded-full text-[#86868b] dark:text-[#8e8e93] hover:text-[#1d1d1f] dark:hover:text-white hover:bg-black/[0.05] dark:hover:bg-white/[0.08] transition cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -159,7 +159,7 @@ export const ListingGeneratorModal: React.FC<ListingGeneratorModalProps> = ({
             
             {/* Choix de la plateforme */}
             <div>
-              <label className="block text-xs font-semibold text-[#1d1d1f] mb-2">
+              <label className="block text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] mb-2">
                 Plateforme cible
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -177,7 +177,7 @@ export const ListingGeneratorModal: React.FC<ListingGeneratorModalProps> = ({
                     className={`py-2 px-3 rounded-xl text-xs font-medium border transition cursor-pointer text-center ${
                       platform === p.id
                         ? 'bg-[#0071e3] text-white border-[#0071e3] shadow-xs'
-                        : 'bg-[#f5f5f7] hover:bg-[#ebebee] text-[#1d1d1f] border-black/[0.05]'
+                        : 'bg-[#f5f5f7] dark:bg-white/[0.06] hover:bg-[#ebebee] dark:hover:bg-white/[0.1] text-[#1d1d1f] dark:text-[#f5f5f7] border-black/[0.05] dark:border-white/[0.06]'
                     }`}
                   >
                     {p.label}
@@ -187,7 +187,7 @@ export const ListingGeneratorModal: React.FC<ListingGeneratorModalProps> = ({
             </div>
 
             {/* Options d'inclusion */}
-            <div className="flex flex-wrap items-center gap-4 text-xs text-[#555558] bg-[#fbfbfd] p-3 rounded-2xl border border-black/[0.04]">
+            <div className="flex flex-wrap items-center gap-4 text-xs text-[#555558] dark:text-[#a1a1a6] bg-[#fbfbfd] dark:bg-white/[0.04] p-3 rounded-2xl border border-black/[0.04] dark:border-white/[0.06]">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -212,12 +212,12 @@ export const ListingGeneratorModal: React.FC<ListingGeneratorModalProps> = ({
             {/* Titre généré */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs font-semibold text-[#1d1d1f]">
+                <label className="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7]">
                   Titre optimisé de l'annonce
                 </label>
-                <span className="text-[10px] text-[#86868b] font-mono">{title.length} caractères</span>
+                <span className="text-[10px] text-[#86868b] dark:text-[#8e8e93] font-mono">{title.length} caractères</span>
               </div>
-              <div className="p-3 rounded-xl bg-[#f5f5f7] border border-black/[0.06] font-medium text-xs text-[#1d1d1f]">
+              <div className="p-3 rounded-xl bg-[#f5f5f7] dark:bg-[#121214] border border-black/[0.06] dark:border-white/[0.08] font-medium text-xs text-[#1d1d1f] dark:text-[#f5f5f7]">
                 {title}
               </div>
             </div>
@@ -225,31 +225,31 @@ export const ListingGeneratorModal: React.FC<ListingGeneratorModalProps> = ({
             {/* Descriptif généré */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs font-semibold text-[#1d1d1f]">
+                <label className="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7]">
                   Texte descriptif rédigé
                 </label>
-                <span className="text-[10px] text-[#86868b]">Formaté avec émojis et puces</span>
+                <span className="text-[10px] text-[#86868b] dark:text-[#8e8e93]">Formaté avec émojis et puces</span>
               </div>
               <textarea
                 readOnly
                 rows={9}
                 value={description}
-                className="w-full p-3.5 rounded-xl bg-[#f5f5f7] border border-black/[0.06] text-xs font-mono text-[#1d1d1f] focus:outline-none resize-none leading-relaxed"
+                className="w-full p-3.5 rounded-xl bg-[#f5f5f7] dark:bg-[#121214] border border-black/[0.06] dark:border-white/[0.08] text-xs font-mono text-[#1d1d1f] dark:text-[#f5f5f7] focus:outline-none resize-none leading-relaxed"
               />
             </div>
 
           </div>
 
           {/* Footer actions */}
-          <div className="px-6 py-4 border-t border-black/[0.06] bg-[#fbfbfd] flex items-center justify-between">
-            <div className="text-xs text-[#86868b]">
-              Prix de vente conseillé : <strong className="text-amber-600 font-semibold">{item.salePrice || 0} €</strong>
+          <div className="px-6 py-4 border-t border-black/[0.06] dark:border-white/[0.08] bg-[#fbfbfd] dark:bg-[#18181b] flex items-center justify-between">
+            <div className="text-xs text-[#86868b] dark:text-[#8e8e93]">
+              Prix de vente conseillé : <strong className="text-amber-600 dark:text-amber-400 font-semibold">{item.salePrice || 0} €</strong>
             </div>
 
             <div className="flex items-center gap-2">
               <button
                 onClick={onClose}
-                className="px-4 py-2 rounded-xl text-xs font-medium bg-[#f5f5f7] hover:bg-[#ebebee] text-[#555558] transition cursor-pointer"
+                className="px-4 py-2 rounded-xl text-xs font-medium bg-[#f5f5f7] dark:bg-white/[0.08] hover:bg-[#ebebee] dark:hover:bg-white/[0.12] text-[#555558] dark:text-[#f5f5f7] transition cursor-pointer"
               >
                 Fermer
               </button>

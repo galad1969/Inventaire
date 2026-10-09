@@ -5,6 +5,7 @@ import { Sidebar } from './Sidebar';
 import { ItemFormModal } from '../inventory/ItemFormModal';
 import { ConfirmModal } from '../common/ConfirmModal';
 import { InsuranceReportModal } from '../inventory/InsuranceReportModal';
+import { OfflineIndicator } from '../common/OfflineIndicator';
 import { useInventory } from '../../context/InventoryContext';
 
 export const AppLayout: React.FC = () => {
@@ -20,7 +21,7 @@ export const AppLayout: React.FC = () => {
   } = useInventory();
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7] text-[#1d1d1f] flex flex-col font-sans selection:bg-[#0071e3] selection:text-white">
+    <div className="min-h-screen bg-[#f5f5f7] dark:bg-[#000000] text-[#1d1d1f] dark:text-[#f5f5f7] flex flex-col font-sans selection:bg-[#0071e3] selection:text-white transition-colors duration-150">
       {/* Barre de navigation supérieure (Navbar) */}
       <Navbar
         isMobileSidebarOpen={isMobileSidebarOpen}
@@ -60,11 +61,14 @@ export const AppLayout: React.FC = () => {
         onClose={closeInsuranceModal}
       />
 
+      {/* Indicateur de statut hors-ligne PWA */}
+      <OfflineIndicator />
+
       {/* Pied de page discret style Apple */}
-      <footer className="border-t border-black/[0.05] bg-white/70 py-4 text-center text-xs text-[#86868b] print:hidden">
+      <footer className="border-t border-black/[0.05] dark:border-white/[0.08] bg-white/70 dark:bg-[#121214]/70 py-4 text-center text-xs text-[#86868b] dark:text-[#8e8e93] print:hidden">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <span>Inventaire Privé • 100% Hors-ligne avec IndexedDB</span>
-          <span className="text-[11px] text-[#a1a1a6]">
+          <span className="text-[11px] text-[#a1a1a6] dark:text-[#636366]">
             Hébergement statique GitHub Pages (HashRouter)
           </span>
         </div>

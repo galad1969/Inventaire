@@ -8,6 +8,7 @@ import {
   deleteItem,
   archiveItem,
   clearEntireDatabase,
+  setPrimaryPhotoForItem,
 } from '../services/db';
 import { seedSampleData } from '../services/sampleData';
 import { ConfirmDialogOptions } from '../components/common/ConfirmModal';
@@ -76,6 +77,7 @@ interface InventoryContextType {
   closeFormModal: () => void;
   deleteItemById: (id: string) => Promise<void>;
   archiveItemById: (id: string) => Promise<void>;
+  setPrimaryPhoto: (itemId: string, photoId: string) => Promise<void>;
 
   // Modal de confirmation sécurisée (évite window.confirm bloqué en iframe)
   confirmOptions: ConfirmDialogOptions | null;
@@ -225,6 +227,19 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     await refreshInventory();
   };
 
+  const setPrimaryPhoto = async (itemId: string, photoId: string) => {
+    // Mise à jour optimiste immédiate dans le state React
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === itemId
+          ? { ...item, primaryPhotoId: photoId, updatedAt: new Date().toISOString() }
+          : item
+      )
+    );
+    await setPrimaryPhotoForItem(itemId, photoId);
+    await refreshInventory();
+  };
+
   useEffect(() => {
     refreshInventory();
   }, []);
@@ -314,6 +329,7 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         closeFormModal,
         deleteItemById,
         archiveItemById,
+        setPrimaryPhoto,
         confirmOptions,
         requestConfirmation,
         closeConfirmation,

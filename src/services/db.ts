@@ -131,6 +131,18 @@ export async function saveItem(item: InventoryItem): Promise<InventoryItem> {
   return updatedItem;
 }
 
+export async function setPrimaryPhotoForItem(itemId: string, photoId: string): Promise<InventoryItem | null> {
+  const item = await getItemById(itemId);
+  if (!item) return null;
+  const updatedItem: InventoryItem = {
+    ...item,
+    primaryPhotoId: photoId,
+    updatedAt: new Date().toISOString(),
+  };
+  await itemsStore.setItem(itemId, updatedItem);
+  return updatedItem;
+}
+
 export async function bulkSaveItems(items: InventoryItem[]): Promise<void> {
   for (const item of items) {
     await itemsStore.setItem(item.id, item);

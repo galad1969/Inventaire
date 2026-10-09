@@ -15,6 +15,7 @@ import {
   Hash,
 } from 'lucide-react';
 import { useInventory } from '../../context/InventoryContext';
+import { PWAInstallButton } from '../common/PWAInstallButton';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -60,7 +61,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     `flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all ${
       isActive
         ? 'bg-[#0071e3] text-white shadow-xs'
-        : 'text-[#1d1d1f] hover:bg-black/[0.04]'
+        : 'text-[#1d1d1f] dark:text-[#f5f5f7] hover:bg-black/[0.04] dark:hover:bg-white/[0.08]'
     }`;
 
   return (
@@ -69,13 +70,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       {isOpen && (
         <div
           onClick={onClose}
-          className="fixed inset-0 bg-black/20 backdrop-blur-xs z-40 md:hidden transition-opacity"
+          className="fixed inset-0 bg-black/40 backdrop-blur-xs z-40 md:hidden transition-opacity"
         />
       )}
 
       {/* Sidebar container */}
       <aside
-        className={`fixed md:sticky top-15 z-40 md:z-20 h-[calc(100vh-3.75rem)] w-68 shrink-0 bg-[#fbfbfd] border-r border-black/[0.06] flex flex-col justify-between overflow-y-auto transition-transform duration-200 ease-out md:translate-x-0 ${
+        className={`fixed md:sticky top-15 z-40 md:z-20 h-[calc(100vh-3.75rem)] w-68 shrink-0 bg-[#fbfbfd] dark:bg-[#121214] border-r border-black/[0.06] dark:border-white/[0.08] flex flex-col justify-between overflow-y-auto transition-transform duration-200 ease-out md:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -83,7 +84,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           
           {/* Main Views Navigation */}
           <div>
-            <div className="text-[11px] font-semibold text-[#86868b] uppercase tracking-wider px-3 mb-2">
+            <div className="text-[11px] font-semibold text-[#86868b] dark:text-[#8e8e93] uppercase tracking-wider px-3 mb-2">
               Inventaire
             </div>
             <nav className="space-y-1">
@@ -101,7 +102,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   <Boxes className="w-4 h-4 opacity-80" />
                   <span>Tous les objets</span>
                 </div>
-                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-black/[0.05] text-current">
+                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-black/[0.05] dark:bg-white/[0.1] text-current">
                   {stats.activeItems}
                 </span>
               </NavLink>
@@ -116,7 +117,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   <span>En vente</span>
                 </div>
                 {stats.forSaleItems > 0 && (
-                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-700">
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300">
                     {stats.forSaleItems}
                   </span>
                 )}
@@ -131,7 +132,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   <MapPin className="w-4 h-4 opacity-80" />
                   <span>Emplacements</span>
                 </div>
-                <span className="text-[11px] text-[#86868b]">{residences.length}</span>
+                <span className="text-[11px] text-[#86868b] dark:text-[#8e8e93]">{residences.length}</span>
               </NavLink>
 
               <NavLink
@@ -144,7 +145,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   <span>Sous garantie</span>
                 </div>
                 {stats.warrantyActiveCount > 0 && (
-                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700">
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
                     {stats.warrantyActiveCount}
                   </span>
                 )}
@@ -160,7 +161,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   <span>Objets archivés</span>
                 </div>
                 {stats.archivedItems > 0 && (
-                  <span className="text-[11px] text-[#86868b]">
+                  <span className="text-[11px] text-[#86868b] dark:text-[#8e8e93]">
                     {stats.archivedItems}
                   </span>
                 )}
@@ -171,13 +172,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   onClose();
                   openInsuranceModal();
                 }}
-                className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-[#1d1d1f] hover:bg-emerald-50 hover:text-emerald-800 transition cursor-pointer text-left"
+                className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-[#1d1d1f] dark:text-[#f5f5f7] hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-800 dark:hover:text-emerald-300 transition cursor-pointer text-left"
               >
                 <div className="flex items-center gap-2.5">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   <span>Rapport Assurance</span>
                 </div>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100/70 text-emerald-800">
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100/70 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300">
                   PDF / Print
                 </span>
               </button>
@@ -187,12 +188,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           {/* Filtres par Résidence */}
           {residences.length > 0 && (
             <div>
-              <div className="text-[11px] font-semibold text-[#86868b] uppercase tracking-wider px-3 mb-2 flex items-center justify-between">
+              <div className="text-[11px] font-semibold text-[#86868b] dark:text-[#8e8e93] uppercase tracking-wider px-3 mb-2 flex items-center justify-between">
                 <span>Résidences</span>
                 {selectedResidence && (
                   <button
                     onClick={() => setSelectedResidence(null)}
-                    className="text-[10px] text-[#0071e3] hover:underline normal-case cursor-pointer"
+                    className="text-[10px] text-[#0071e3] dark:text-[#0a84ff] hover:underline normal-case cursor-pointer"
                   >
                     Effacer
                   </button>
@@ -210,12 +211,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                       }}
                       className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs transition cursor-pointer text-left ${
                         isSelected
-                          ? 'bg-[#0071e3]/10 text-[#0071e3] font-semibold'
-                          : 'text-[#555558] hover:bg-black/[0.04]'
+                          ? 'bg-[#0071e3]/10 dark:bg-[#0071e3]/20 text-[#0071e3] dark:text-[#0a84ff] font-semibold'
+                          : 'text-[#555558] dark:text-[#a1a1a6] hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:text-[#1d1d1f] dark:hover:text-[#f5f5f7]'
                       }`}
                     >
                       <div className="flex items-center gap-2 truncate">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] dark:bg-[#0a84ff] shrink-0" />
                         <span className="truncate">{res}</span>
                       </div>
                       <ChevronRight className="w-3 h-3 opacity-40 shrink-0" />
@@ -228,12 +229,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
           {/* Filtres par Catégories */}
           <div>
-            <div className="text-[11px] font-semibold text-[#86868b] uppercase tracking-wider px-3 mb-2 flex items-center justify-between">
+            <div className="text-[11px] font-semibold text-[#86868b] dark:text-[#8e8e93] uppercase tracking-wider px-3 mb-2 flex items-center justify-between">
               <span>Catégories</span>
               {selectedCategory && (
                 <button
                   onClick={() => setSelectedCategory(null)}
-                  className="text-[10px] text-[#0071e3] hover:underline normal-case cursor-pointer"
+                  className="text-[10px] text-[#0071e3] dark:text-[#0a84ff] hover:underline normal-case cursor-pointer"
                 >
                   Toutes
                 </button>
@@ -252,13 +253,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                     }}
                     className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs transition cursor-pointer text-left ${
                       isSelected
-                        ? 'bg-[#0071e3]/10 text-[#0071e3] font-semibold'
-                        : 'text-[#555558] hover:bg-black/[0.04]'
+                        ? 'bg-[#0071e3]/10 dark:bg-[#0071e3]/20 text-[#0071e3] dark:text-[#0a84ff] font-semibold'
+                        : 'text-[#555558] dark:text-[#a1a1a6] hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:text-[#1d1d1f] dark:hover:text-[#f5f5f7]'
                     }`}
                   >
                     <span className="truncate">{cat}</span>
                     {count > 0 && (
-                      <span className="text-[10px] text-[#86868b] shrink-0 font-medium">
+                      <span className="text-[10px] text-[#86868b] dark:text-[#8e8e93] shrink-0 font-medium">
                         {count}
                       </span>
                     )}
@@ -271,15 +272,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           {/* Filtres par Étiquettes / Tags transversaux */}
           {allTags.length > 0 && (
             <div>
-              <div className="text-[11px] font-semibold text-[#86868b] uppercase tracking-wider px-3 mb-2 flex items-center justify-between">
+              <div className="text-[11px] font-semibold text-[#86868b] dark:text-[#8e8e93] uppercase tracking-wider px-3 mb-2 flex items-center justify-between">
                 <span className="flex items-center gap-1">
-                  <Hash className="w-3 h-3 text-[#0071e3]" />
+                  <Hash className="w-3 h-3 text-[#0071e3] dark:text-[#0a84ff]" />
                   <span>Étiquettes</span>
                 </span>
                 {selectedTag && (
                   <button
                     onClick={() => setSelectedTag(null)}
-                    className="text-[10px] text-[#0071e3] hover:underline normal-case cursor-pointer"
+                    className="text-[10px] text-[#0071e3] dark:text-[#0a84ff] hover:underline normal-case cursor-pointer"
                   >
                     Effacer
                   </button>
@@ -298,13 +299,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                       className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] transition cursor-pointer ${
                         isSelected
                           ? 'bg-[#0071e3] text-white font-semibold shadow-2xs'
-                          : 'bg-black/[0.04] hover:bg-black/[0.08] text-[#1d1d1f]'
+                          : 'bg-black/[0.04] dark:bg-white/[0.08] hover:bg-black/[0.08] dark:hover:bg-white/[0.14] text-[#1d1d1f] dark:text-[#f5f5f7]'
                       }`}
                     >
                       <span>#{name}</span>
                       <span
                         className={`text-[9px] px-1 rounded-full ${
-                          isSelected ? 'bg-white/20 text-white' : 'bg-black/[0.05] text-[#86868b]'
+                          isSelected ? 'bg-white/20 text-white' : 'bg-black/[0.05] dark:bg-white/[0.1] text-[#86868b] dark:text-[#8e8e93]'
                         }`}
                       >
                         {count}
@@ -319,13 +320,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Bottom Section: Offline Status & Settings */}
-        <div className="p-3 border-t border-black/[0.06] bg-white/60 space-y-2">
-          <div className="px-3 py-2 rounded-xl bg-black/[0.03] text-[11px] text-[#86868b] flex items-center justify-between">
+        <div className="p-3 border-t border-black/[0.06] dark:border-white/[0.08] bg-white/60 dark:bg-[#121214]/80 space-y-2">
+          <PWAInstallButton variant="sidebar" />
+
+          <div className="px-3 py-2 rounded-xl bg-black/[0.03] dark:bg-white/[0.04] text-[11px] text-[#86868b] dark:text-[#8e8e93] flex items-center justify-between">
             <div className="flex items-center gap-1.5">
-              <HardDrive className="w-3.5 h-3.5 text-emerald-600" />
+              <HardDrive className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
               <span>IndexedDB Hors-ligne</span>
             </div>
-            <span className="font-semibold text-[#1d1d1f]">
+            <span className="font-semibold text-[#1d1d1f] dark:text-[#f5f5f7]">
               {stats.totalValue > 0 ? `${stats.totalValue.toLocaleString('fr-FR')} €` : '0 €'}
             </span>
           </div>
@@ -338,7 +341,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 `flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium rounded-lg transition ${
                   isActive
                     ? 'bg-[#0071e3] text-white'
-                    : 'text-[#555558] hover:bg-black/[0.04]'
+                    : 'text-[#555558] dark:text-[#a1a1a6] hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:text-[#1d1d1f] dark:hover:text-[#f5f5f7]'
                 }`
               }
             >
@@ -351,8 +354,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               className={({ isActive }) =>
                 `p-1.5 text-xs rounded-lg transition ${
                   isActive
-                    ? 'bg-black/[0.08] text-[#1d1d1f]'
-                    : 'text-[#86868b] hover:text-[#1d1d1f] hover:bg-black/[0.04]'
+                    ? 'bg-black/[0.08] dark:bg-white/[0.14] text-[#1d1d1f] dark:text-[#f5f5f7]'
+                    : 'text-[#86868b] dark:text-[#a1a1a6] hover:text-[#1d1d1f] dark:hover:text-[#f5f5f7] hover:bg-black/[0.04] dark:hover:bg-white/[0.06]'
                 }`
               }
               title="Paramètres"

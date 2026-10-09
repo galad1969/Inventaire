@@ -49,10 +49,11 @@ export const ForSalePage: React.FC = () => {
     async function loadThumbs() {
       const urls: Record<string, string> = {};
       for (const it of items) {
-        if (it.primaryPhotoId && !urls[it.primaryPhotoId]) {
-          const m = await getMediaById(it.primaryPhotoId);
+        const targetPhotoId = it.primaryPhotoId || (it.mediaIds && it.mediaIds[0]);
+        if (targetPhotoId && !urls[targetPhotoId]) {
+          const m = await getMediaById(targetPhotoId);
           if (m && m.blob && isMounted) {
-            urls[it.primaryPhotoId] = URL.createObjectURL(m.blob);
+            urls[targetPhotoId] = URL.createObjectURL(m.blob);
           }
         }
       }
@@ -242,7 +243,8 @@ export const ForSalePage: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {currentList.map((item) => {
-            const photoUrl = item.primaryPhotoId ? thumbnails[item.primaryPhotoId] : null;
+            const photoId = item.primaryPhotoId || (item.mediaIds && item.mediaIds[0]);
+            const photoUrl = photoId ? thumbnails[photoId] : null;
 
             return (
               <div

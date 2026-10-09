@@ -1,7 +1,11 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { registerSW } from 'virtual:pwa-register';
 import App from './App.tsx';
 import './index.css';
+
+// Enregistrement automatique du Service Worker PWA (mise à jour transparente et cache hors-ligne)
+registerSW({ immediate: true });
 
 interface ErrorBoundaryProps {
   children: ReactNode;
