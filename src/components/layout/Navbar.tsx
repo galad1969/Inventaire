@@ -14,6 +14,7 @@ import {
   Shield,
   Sun,
   Moon,
+  BookOpen,
 } from 'lucide-react';
 import { useInventory } from '../../context/InventoryContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -152,6 +153,22 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <Download className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Sauvegardes</span>
+          </NavLink>
+
+          {/* Guide d'utilisation / Documentation */}
+          <NavLink
+            to="/guide"
+            className={({ isActive }) =>
+              `flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition ${
+                isActive
+                  ? 'bg-[#0071e3] text-white shadow-sm'
+                  : 'bg-black/[0.04] dark:bg-white/[0.08] hover:bg-black/[0.07] dark:hover:bg-white/[0.12] text-[#1d1d1f] dark:text-[#f5f5f7]'
+              }`
+            }
+            title="Manuel et Guide d'utilisation de l'application"
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span className="hidden xl:inline">Guide</span>
           </NavLink>
 
           {/* Bascule Thème Sombre / Clair Apple */}

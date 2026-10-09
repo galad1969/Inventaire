@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Settings, Plus, X, Check, Globe, Smartphone, Sun, Moon, Monitor } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
+import { Settings, Plus, X, Check, Globe, Smartphone, Sun, Moon, Monitor, BookOpen } from 'lucide-react';
 import { useInventory } from '../context/InventoryContext';
 import { useTheme, ThemeMode } from '../context/ThemeContext';
 import { PWAInstallButton } from '../components/common/PWAInstallButton';
@@ -263,6 +264,25 @@ export const SettingsPage: React.FC = () => {
         >
           <span>Ouvrir l'état pour assurance</span>
         </button>
+      </div>
+
+      {/* Documentation et Guide d'utilisation */}
+      <div className="p-6 rounded-3xl bg-white dark:bg-[#1c1c1e] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_2px_12px_rgba(0,0,0,0.02)] space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-[#0071e3] dark:text-[#0a84ff]" />
+            <h2 className="text-sm font-semibold text-[#1d1d1f] dark:text-[#f5f5f7]">Manuel & Guide d'Utilisation</h2>
+          </div>
+          <NavLink
+            to="/guide"
+            className="px-3.5 py-1.5 rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold shadow-xs transition"
+          >
+            Consulter le guide
+          </NavLink>
+        </div>
+        <p className="text-xs text-[#86868b] dark:text-[#8e8e93] leading-relaxed">
+          Retrouvez les explications complètes sur la localisation en poupées russes, l'assignation de la photo d'illustration par défaut, la génération d'annonces de vente, les rapports d'assurance et la gestion hors-ligne.
+        </p>
       </div>
 
       {/* Application Progressive Web App (PWA) & Mode Hors-ligne */}

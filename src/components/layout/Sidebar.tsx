@@ -13,6 +13,7 @@ import {
   ChevronRight,
   HardDrive,
   Hash,
+  BookOpen,
 } from 'lucide-react';
 import { useInventory } from '../../context/InventoryContext';
 import { PWAInstallButton } from '../common/PWAInstallButton';
@@ -165,6 +166,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                     {stats.archivedItems}
                   </span>
                 )}
+              </NavLink>
+
+              <NavLink
+                to="/guide"
+                onClick={onClose}
+                className={navItemClass}
+              >
+                <div className="flex items-center gap-2.5">
+                  <BookOpen className="w-4 h-4 opacity-80" />
+                  <span>Guide d'utilisation</span>
+                </div>
+                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-[#0071e3]/10 dark:bg-[#0071e3]/20 text-[#0071e3] dark:text-[#0a84ff]">
+                  Aide
+                </span>
               </NavLink>
 
               <button

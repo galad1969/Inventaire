@@ -10,6 +10,7 @@ import { WarrantiesPage } from './pages/WarrantiesPage';
 import { ArchivedPage } from './pages/ArchivedPage';
 import { BackupPage } from './pages/BackupPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { UserGuidePage } from './pages/UserGuidePage';
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
               <Route path="archived" element={<ArchivedPage />} />
               <Route path="backup" element={<BackupPage />} />
               <Route path="settings" element={<SettingsPage />} />
+              <Route path="guide" element={<UserGuidePage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>
